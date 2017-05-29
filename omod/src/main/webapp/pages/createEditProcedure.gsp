@@ -95,7 +95,7 @@ input.error {
             initialValue : (procedure.name ?: '')
     ])}
 
-    ${ui.includeFragment("emr", "field/textarea", [
+    ${ui.includeFragment("uicommons", "field/textarea", [
             label        : ui.message("general.description"),
             formFieldName: "description",
             id           : "description",
