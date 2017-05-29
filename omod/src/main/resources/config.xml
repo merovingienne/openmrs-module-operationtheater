@@ -99,5 +99,10 @@
 
     </require_modules>
     <!-- /Module Dependencies -->
+
+    <!--modules to be aware of-->
+    <aware_of_modules>
+        <aware_of_module>org.openmrs.module.legacyui</aware_of_module>
+    </aware_of_modules>
 </module>
 
