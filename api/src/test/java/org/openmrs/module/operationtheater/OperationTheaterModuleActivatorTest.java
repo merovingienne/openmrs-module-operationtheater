@@ -42,7 +42,7 @@ public class OperationTheaterModuleActivatorTest extends BaseModuleContextSensit
 		idType.setName(OTMetadata.OPENMRS_ID_NAME);
 		idType.setDescription("description");
 		idType.setValidator("org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator");
-		idType.setCheckDigit(true);
+//		idType.setCheckDigit(true);
 		idType.setLocationBehavior(PatientIdentifierType.LocationBehavior.NOT_USED);
 		patientService.savePatientIdentifierType(idType);
 
@@ -80,7 +80,7 @@ public class OperationTheaterModuleActivatorTest extends BaseModuleContextSensit
 		mockIdGenerator.setName("name");
 		mockIdGenerator.setUuid("uuid");
 		mockIdGenerator.setBaseCharacterSet(new LuhnMod30IdentifierValidator().getBaseCharacters());
-		mockIdGenerator.setLength(6);
+//		mockIdGenerator.setLength(6);
 		mockIdGenerator.setFirstIdentifierBase("10000");
 
 		IdentifierSourceService mockIdService = Mockito.mock(IdentifierSourceService.class);
