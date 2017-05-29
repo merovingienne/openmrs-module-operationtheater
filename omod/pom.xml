@@ -198,6 +198,15 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
+
+
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>legacyui-omod</artifactId>
+            <version>1.2.3</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- End OpenMRS modules -->
 
         <!-- Resolves error that AppTest couldn't find class javax.validation.Validator in AppTestUtil -->

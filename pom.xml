@@ -5,7 +5,7 @@
 
     <groupId>org.openmrs.module</groupId>
     <artifactId>operationtheater</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Operation Theater Module</name>
     <description>Managing and scheduling Operation Theater activities</description>
@@ -14,6 +14,9 @@
     <developers>
         <developer>
             <name>Lukas Breitwieser</name>
+        </developer>
+        <developer>
+            <name>Chanuka Wijayakoon</name>
         </developer>
     </developers>
 
@@ -35,32 +38,32 @@
     </modules>
 
     <properties>
-        <openMRSVersion>1.9.7</openMRSVersion>
+        <openMRSVersion>2.0.5</openMRSVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <appframeworkVersion>2.1</appframeworkVersion>
-        <uiframeworkVersion>3.2</uiframeworkVersion>
-        <emrapiVersion>1.2</emrapiVersion>
-        <appuiVersion>1.1</appuiVersion>
-        <uicommonsVersion>1.2</uicommonsVersion>
-        <webserviceRestVersion>2.5</webserviceRestVersion>
-        <apppointmentschedulingVersion>1.0</apppointmentschedulingVersion>
-        <coreappsVersion>1.2</coreappsVersion>
+        <appframeworkVersion>2.10.0</appframeworkVersion>
+        <uiframeworkVersion>3.11.0</uiframeworkVersion>
+        <emrapiVersion>1.21.0</emrapiVersion>
+        <appuiVersion>1.8.0</appuiVersion>
+        <uicommonsVersion>2.3.0</uicommonsVersion>
+        <webserviceRestVersion>2.19.0</webserviceRestVersion>
+        <appointmentschedulingVersion>1.8.0</appointmentschedulingVersion>
+        <coreappsVersion>1.13.0</coreappsVersion>
 
-        <htmlformentryVersion>2.1.4</htmlformentryVersion>
-        <idgenVersion>2.5</idgenVersion>
-        <providerManagementVersion>2.0</providerManagementVersion>
-        <reportingVersion>0.9.1</reportingVersion>
-        <calculationVersion>1.0</calculationVersion>
-        <serializationxstreamVersion>0.2.7</serializationxstreamVersion>
+        <htmlformentryVersion>3.3.2</htmlformentryVersion>
+        <idgenVersion>4.4.1</idgenVersion>
+        <providerManagementVersion>2.6.0</providerManagementVersion>
+        <reportingVersion>1.12.0</reportingVersion>
+        <calculationVersion>1.2</calculationVersion>
+        <serializationxstreamVersion>0.2.12</serializationxstreamVersion>
 
         <optaplannerVersion>6.0.1.Final</optaplannerVersion>
         <droolsCompilerVersion>6.0.1.Final</droolsCompilerVersion>
 
-        <jodatimeVersion>2.2</jodatimeVersion>
+        <jodatimeVersion>2.9.2</jodatimeVersion>
         <jodatimeHibernateVersion>1.3</jodatimeHibernateVersion>
 
-        <xstreamVersion>1.4.7</xstreamVersion>
+        <serialization.xstreamVersion>0.2.12</serialization.xstreamVersion>
     </properties>
 
     <dependencyManagement>
@@ -170,7 +173,7 @@
             <dependency>
                 <groupId>org.openmrs.module</groupId>
                 <artifactId>appointmentscheduling-api</artifactId>
-                <version>${apppointmentschedulingVersion}</version>
+                <version>${appointmentschedulingVersion}</version>
                 <type>jar</type>
                 <scope>provided</scope>
             </dependency>
@@ -196,6 +199,32 @@
                 <artifactId>webservices.rest-omod</artifactId>
                 <version>${webserviceRestVersion}</version>
                 <classifier>tests</classifier>
+                <scope>test</scope>
+            </dependency>
+
+            <!--Xstream-->
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>serialization.xstream-api</artifactId>
+                <version>${serialization.xstreamVersion}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>serialization.xstream-api-1.9</artifactId>
+                <version>${serialization.xstreamVersion}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>serialization.xstream-api-1.10</artifactId>
+                <version>${serialization.xstreamVersion}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>serialization.xstream-api-2.0</artifactId>
+                <version>${serialization.xstreamVersion}</version>
                 <scope>test</scope>
             </dependency>
 
@@ -231,16 +260,10 @@
                 <type>jar</type>
             </dependency>
 
-            <!-- Xstream -->
-            <!--<dependency>-->
-            <!--<groupId>com.thoughtworks.xstream</groupId>-->
-            <!--<artifactId>xstream</artifactId>-->
-            <!--<version>${xstreamVersion}</version>-->
-            <!--<type>jar</type>-->
-            <!--&lt;!&ndash;<scope>provided</scope>&ndash;&gt;-->
-            <!--</dependency>-->
+
 
             <!-- joda time -->
+            <!-- 2017.05.28 - Stop loadng joda, as it is already loaded in the core-->
             <dependency>
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
