@@ -1,23 +1,14 @@
 package org.openmrs.module.operationtheater;
 
-import org.hibernate.annotations.Type;
-import org.joda.time.DateTime;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Set;
+
+
+import org.openmrs.module.operationtheater.attribute.converter.time.LocalDateAttributeConverter;
 
 /**
  * Defines a Surgery in the system.
@@ -40,12 +31,12 @@ public class Surgery extends BaseOpenmrsDataJPA {
 	private Procedure procedure;
 
 	@Column(name = "date_started")
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
-	private DateTime dateStarted;
+	@Convert( converter = LocalDateAttributeConverter.class)
+	private LocalDate dateStarted;
 
 	@Column(name = "date_finished")
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
-	private DateTime dateFinished;
+	@Convert( converter = LocalDateAttributeConverter.class)
+	private LocalDate dateFinished;
 
 	@OneToOne(cascade = { CascadeType.ALL })
 	@JoinColumn(name = "scheduling_data_id")
@@ -111,19 +102,19 @@ public class Surgery extends BaseOpenmrsDataJPA {
 		this.surgicalTeam = surgicalTeam;
 	}
 
-	public DateTime getDateFinished() {
+	public LocalDate getDateFinished() {
 		return dateFinished;
 	}
 
-	public void setDateFinished(DateTime dateFinished) {
+	public void setDateFinished(LocalDate dateFinished) {
 		this.dateFinished = dateFinished;
 	}
 
-	public DateTime getDateStarted() {
+	public LocalDate getDateStarted() {
 		return dateStarted;
 	}
 
-	public void setDateStarted(DateTime dateStarted) {
+	public void setDateStarted(LocalDate dateStarted) {
 		this.dateStarted = dateStarted;
 	}
 }

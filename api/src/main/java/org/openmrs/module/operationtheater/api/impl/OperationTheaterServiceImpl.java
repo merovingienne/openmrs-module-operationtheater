@@ -15,10 +15,10 @@ package org.openmrs.module.operationtheater.api.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.joda.time.Interval;
-import org.joda.time.LocalTime;
-import org.joda.time.format.DateTimeFormatter;
+//import org.joda.time.LocalTime;
+//import org.joda.time.format.DateTimeFormatter;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.Patient;
@@ -37,6 +37,11 @@ import org.openmrs.validator.ValidateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -146,7 +151,7 @@ public class OperationTheaterServiceImpl extends BaseOpenmrsService implements O
 	}
 
 	@Override
-	public List<Surgery> getScheduledSurgeries(DateTime from, DateTime to) {
+	public List<Surgery> getScheduledSurgeries(LocalDate from, LocalDate to) {
 		if (from == null || to == null) {
 			return new ArrayList<Surgery>();
 		}
@@ -154,7 +159,7 @@ public class OperationTheaterServiceImpl extends BaseOpenmrsService implements O
 	}
 
 	@Override
-	public List<Surgery> getAllOngoingSurgeries(DateTime dateTime) {
+	public List<Surgery> getAllOngoingSurgeries(LocalDate dateTime) {
 		if (dateTime == null) {
 			return new ArrayList<Surgery>();
 		}
@@ -183,10 +188,11 @@ public class OperationTheaterServiceImpl extends BaseOpenmrsService implements O
 	}
 
 	@Override
-	public Interval getLocationAvailableTime(Location location, DateTime date) {
-		Date date1 = date.toDate();
-		List<AppointmentBlock> blocks = appointmentService.getAppointmentBlocks(date.withTime(0, 0, 0, 0).toDate(),
-				date.withTime(0, 0, 0, 0).plusDays(1).toDate(), location.getId() + ",", null, null);
+	public Interval getLocationAvailableTime(Location location, LocalDate date) {
+		Date date1 = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		Date date2 = Date.from(date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+		List<AppointmentBlock> blocks = appointmentService.getAppointmentBlocks(date1,
+				date2, location.getId() + ",", null, null);
 		//		List<AppointmentBlock> blocks = new ArrayList<AppointmentBlock>();
 
 		if (blocks.size() == 1) {
@@ -196,12 +202,13 @@ public class OperationTheaterServiceImpl extends BaseOpenmrsService implements O
 		}
 
 		DateTimeFormatter timeFormatter = OTMetadata.AVAILABLE_TIME_FORMATTER;
-		DateTime availableStart = null;
-		DateTime availableEnd = null;
+		LocalDateTime availableStart = null;
+		LocalDateTime availableEnd = null;
 		for (LocationAttribute attribute : location.getAttributes()) {
 			if (attribute.getAttributeType().getUuid().equals(OTMetadata.DEFAULT_AVAILABLE_TIME_BEGIN_UUID)) {
 				LocalTime beginTime = LocalTime.parse((String) attribute.getValue(), timeFormatter);
-				availableStart = date.withTime(beginTime.getHourOfDay(), beginTime.getMinuteOfHour(), 0, 0);
+//				availableStart = date.withTime(beginTime.getHourOfDay(), beginTime.getMinuteOfHour(), 0, 0);
+				availableStart = date1.withTime(beginTime.getHourOfDay(), beginTime.getMinuteOfHour(), 0, 0);
 			} else if (attribute.getAttributeType().getUuid().equals(OTMetadata.DEFAULT_AVAILABLE_TIME_END_UUID)) {
 				LocalTime endTime = LocalTime.parse((String) attribute.getValue(), timeFormatter);
 				availableEnd = date.withTime(endTime.getHourOfDay(), endTime.getMinuteOfHour(), 0, 0);

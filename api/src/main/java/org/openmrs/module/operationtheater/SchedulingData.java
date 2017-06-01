@@ -3,7 +3,7 @@ package org.openmrs.module.operationtheater;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.annotations.Type;
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.openmrs.Location;
 
 import javax.persistence.Basic;
@@ -14,6 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import java.time.LocalDateTime;
 
 /**
  * Defines scheduling data in the system.
@@ -33,15 +35,15 @@ public class SchedulingData extends BaseOpenmrsDataJPA {
 	 * date time when the corresponding surgery is scheduled
 	 */
 	@Column(name = "start")
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
-	private DateTime start;
+	@Type(type = "java.time.LocalDateTime")
+	private LocalDateTime start;
 
 	/**
 	 * date time when the corresponding surgery is scheduled
 	 */
 	@Column(name = "end")
-	@Type(type = "org.joda.time.contrib.hibernate.PersistentDateTime")
-	private DateTime end;
+	@Type(type = "java.time.LocalDateTime")
+	private LocalDateTime end;
 
 	/**
 	 * tells the scheduler that this surgery MUST be performed on the date
@@ -73,11 +75,11 @@ public class SchedulingData extends BaseOpenmrsDataJPA {
 		setSchedulingDataId(id);
 	}
 
-	public DateTime getStart() {
+	public LocalDateTime getStart() {
 		return start;
 	}
 
-	public void setStart(DateTime start) {
+	public void setStart(LocalDateTime start) {
 		this.start = start;
 	}
 
@@ -97,11 +99,11 @@ public class SchedulingData extends BaseOpenmrsDataJPA {
 		this.location = location;
 	}
 
-	public DateTime getEnd() {
+	public LocalDateTime getEnd() {
 		return end;
 	}
 
-	public void setEnd(DateTime end) {
+	public void setEnd(LocalDateTime end) {
 		this.end = end;
 	}
 }
