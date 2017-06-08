@@ -16,7 +16,7 @@ package org.openmrs.module.operationtheater.api.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 //import org.joda.time.DateTime;
-import org.joda.time.Interval;
+//import org.joda.time.Interval;
 //import org.joda.time.LocalTime;
 //import org.joda.time.format.DateTimeFormatter;
 import org.openmrs.Location;
@@ -37,14 +37,13 @@ import org.openmrs.validator.ValidateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.threeten.extra.Interval;
 
 /**
  * It is a default implementation of {@link OperationTheaterService}.
@@ -196,7 +195,10 @@ public class OperationTheaterServiceImpl extends BaseOpenmrsService implements O
 		//		List<AppointmentBlock> blocks = new ArrayList<AppointmentBlock>();
 
 		if (blocks.size() == 1) {
-			return new Interval(new DateTime(blocks.get(0).getStartDate()), new DateTime(blocks.get(0).getEndDate()));
+//			return new Interval(new DateTime(blocks.get(0).getStartDate()), new DateTime(blocks.get(0).getEndDate()));
+			Instant startInstant = LocalDateTime.from(blocks.get(0).getStartDate().toInstant()).toInstant(ZoneOffset.UTC);
+			Instant endInstant = LocalDateTime.from(blocks.get(0).getEndDate().toInstant()).toInstant(ZoneOffset.UTC);
+			return Interval.of(startInstant, endInstant);
 		} else if (blocks.size() > 1) {
 			throw new APIException("There shouldn't be multiple appointment blocks per location and date");
 		}
@@ -208,15 +210,16 @@ public class OperationTheaterServiceImpl extends BaseOpenmrsService implements O
 			if (attribute.getAttributeType().getUuid().equals(OTMetadata.DEFAULT_AVAILABLE_TIME_BEGIN_UUID)) {
 				LocalTime beginTime = LocalTime.parse((String) attribute.getValue(), timeFormatter);
 //				availableStart = date.withTime(beginTime.getHourOfDay(), beginTime.getMinuteOfHour(), 0, 0);
-				availableStart = date1.withTime(beginTime.getHourOfDay(), beginTime.getMinuteOfHour(), 0, 0);
+				availableStart = date.atTime(beginTime.getHour(), beginTime.getMinute());
 			} else if (attribute.getAttributeType().getUuid().equals(OTMetadata.DEFAULT_AVAILABLE_TIME_END_UUID)) {
 				LocalTime endTime = LocalTime.parse((String) attribute.getValue(), timeFormatter);
-				availableEnd = date.withTime(endTime.getHourOfDay(), endTime.getMinuteOfHour(), 0, 0);
+//				availableEnd = date.withTime(endTime.getHourOfDay(), endTime.getMinuteOfHour(), 0, 0);
+				availableEnd = date.atTime(endTime.getHour(), endTime.getMinute());
 			}
 		}
 
 		if (availableStart != null && availableEnd != null) {
-			return new Interval(availableStart, availableEnd);
+			return Interval.of(availableStart.toInstant(ZoneOffset.UTC), availableEnd.toInstant(ZoneOffset.UTC));
 		}
 
 		throw new APIException("Available times not defined. please make sure that the attributes " +

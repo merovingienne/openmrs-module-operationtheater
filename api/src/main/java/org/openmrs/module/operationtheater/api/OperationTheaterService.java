@@ -13,8 +13,8 @@
  */
 package org.openmrs.module.operationtheater.api;
 
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
+//import org.joda.time.DateTime;
+//import org.joda.time.Interval;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.api.APIException;
@@ -29,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import org.threeten.extra.Interval;
 
 /**
  * This service exposes module's core functionality. It is a Spring managed bean which is configured in moduleApplicationContext.xml.

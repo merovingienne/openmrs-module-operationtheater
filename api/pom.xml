@@ -127,6 +127,12 @@
             <artifactId>joda-time-hibernate</artifactId>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.threeten</groupId>
+            <artifactId>threeten-extra</artifactId>
+        </dependency>
+
         <!-- optaplanner and drools  -->
         <dependency>
             <groupId>org.optaplanner</groupId>

@@ -26,6 +26,8 @@ import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -66,7 +68,7 @@ public class DrlRuleTest {
 	@Test
 	public void testRule_overlappingSurgeriesInSameOperationTheater() {
 		OperationTheaterService otService = Mockito.mock(OperationTheaterService.class);
-		when(otService.getLocationAvailableTime(any(Location.class), any(DateTime.class))).thenReturn(null);
+		when(otService.getLocationAvailableTime(any(Location.class), any(LocalDate.class))).thenReturn(null);
 
 		Location location = new Location();
 
@@ -76,11 +78,11 @@ public class DrlRuleTest {
 		ps1.setLocation(location);
 		ps2.setLocation(location);
 
-		DateTime start1 = new DateTime();
-		DateTime start2 = start1.plusHours(1);
+		LocalDateTime start1 = LocalDateTime.now();
+		LocalDateTime start2 = start1.plusHours(1);
 
-		DateTime end1 = start1.plusHours(2);
-		DateTime end2 = end1.plusHours(1);
+		LocalDateTime end1 = start1.plusHours(2);
+		LocalDateTime end2 = end1.plusHours(1);
 
 		ps1.setStart(start1, false);
 		ps2.setStart(start2, false);

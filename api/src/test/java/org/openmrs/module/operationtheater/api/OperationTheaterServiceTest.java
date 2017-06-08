@@ -13,13 +13,14 @@
  */
 package org.openmrs.module.operationtheater.api;
 
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
+//import org.joda.time.DateTime;
+//import org.joda.time.Interval;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.mockito.cglib.core.Local;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
@@ -43,6 +44,10 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -61,6 +66,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.threeten.extra.Interval;
 
 /**
  * Tests {@link ${OperationTheaterService}}.
@@ -316,23 +323,26 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 
 	/**
 	 * @verifies return interval from corresponding appointmentBlock
-	 * @see OperationTheaterService#getLocationAvailableTime(org.openmrs.Location, org.joda.time.DateTime)
+	 * @see OperationTheaterService#getLocationAvailableTime(org.openmrs.Location, LocalDate)
 	 */
 	@Test
 	public void getLocationAvailableTime_shouldReturnIntervalFromCorrespondingAppointmentBlock() throws Exception {
 		Location location = new Location();
 		location.setName("operation theater");
 
-		DateTime date = new DateTime();
+		ZonedDateTime date = ZonedDateTime.now();
 		ArrayList<AppointmentBlock> blocks = new ArrayList<AppointmentBlock>();
 		AppointmentBlock block = new AppointmentBlock();
-		block.setStartDate(date.withTime(12, 30, 0, 0).toDate());
-		block.setEndDate(date.withTime(13, 30, 0, 0).toDate());
+//		block.setStartDate(date.withTime(12, 30, 0, 0).toDate());
+		block.setStartDate(Date.from(date.withHour(12).withMinute(30).truncatedTo(ChronoUnit.MINUTES).toInstant()));
+//		block.setEndDate(date.withTime(13, 30, 0, 0).toDate());
+		block.setEndDate(Date.from(date.withHour(13).withMinute(30).truncatedTo(ChronoUnit.MINUTES).toInstant()));
 		blocks.add(block);
 
 		AppointmentService appointmentService = Mockito.mock(AppointmentService.class);
-		Date from = date.withTimeAtStartOfDay().toDate();
-		Date to = date.withTimeAtStartOfDay().plusDays(1).toDate();
+		Date from = Date.from(date.truncatedTo(ChronoUnit.DAYS).toInstant());
+//		Date to = date.withTimeAtStartOfDay().plusDays(1).toDate();
+		Date to = Date.from(date.truncatedTo(ChronoUnit.DAYS).plusDays(1).toInstant());
 		when(appointmentService.getAppointmentBlocks(eq(from), eq(to), eq(location.getId() + ","), any(Provider.class),
 				any(AppointmentType.class))).thenReturn(blocks);
 
@@ -340,17 +350,17 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 		Whitebox.setInternalState(otService, "appointmentService", appointmentService);
 
 		//call function under test
-		Interval result = otService.getLocationAvailableTime(location, date);
+		Interval result = otService.getLocationAvailableTime(location, date.toLocalDate());
 
 		//verify
 		assertThat(result, notNullValue(Interval.class));
-		assertThat(result.getStart(), equalTo(date.withTime(12, 30, 0, 0)));
-		assertThat(result.getEnd(), equalTo(date.withTime(13, 30, 0, 0)));
+		assertThat(result.getStart(), equalTo(date.toLocalDate().atTime(12, 30).toInstant(ZoneOffset.UTC)));
+		assertThat(result.getEnd(), equalTo(date.toLocalDate().atTime(13, 30).toInstant(ZoneOffset.UTC)));
 	}
 
 	/**
 	 * @verifies return interval from location attribute if there is no appointmentBlock entry
-	 * @see OperationTheaterService#getLocationAvailableTime(org.openmrs.Location, org.joda.time.DateTime)
+	 * @see OperationTheaterService#getLocationAvailableTime(org.openmrs.Location, LocalDate)
 	 */
 	@Test
 	public void getLocationAvailableTime_shouldReturnIntervalFromLocationAttributeIfThereIsNoAppointmentBlockEntry()
@@ -379,17 +389,17 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 		location.setAttributes(attributes);
 
 		//call function under test
-		Interval result = otService.getLocationAvailableTime(location, new DateTime());
+		Interval result = otService.getLocationAvailableTime(location, LocalDate.now());
 
 		//verify
 		assertThat(result, notNullValue(Interval.class));
-		assertThat(result.getStart(), equalTo(new DateTime().withTime(12, 30, 0, 0)));
-		assertThat(result.getEnd(), equalTo(new DateTime().withTime(13, 30, 0, 0)));
+		assertThat(result.getStart(), equalTo(LocalDate.now().atTime(12, 30).toInstant(ZoneOffset.UTC)));
+		assertThat(result.getEnd(), equalTo(LocalDate.now().atTime(13, 30).toInstant(ZoneOffset.UTC)));
 	}
 
 	/**
 	 * @verifies throw APIException if there is more than one appoitnmentBlock for this day and location
-	 * @see OperationTheaterService#getLocationAvailableTime(org.openmrs.Location, org.joda.time.DateTime)
+	 * @see OperationTheaterService#getLocationAvailableTime(org.openmrs.Location, LocalDate)
 	 */
 	@Test(expected = APIException.class)
 	public void getLocationAvailableTime_shouldThrowAPIExceptionIfThereIsMoreThanOneAppoitnmentBlockForThisDayAndLocation()
@@ -405,12 +415,12 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 		Whitebox.setInternalState(otService, "appointmentService", appointmentService);
 
 		//call function under test
-		otService.getLocationAvailableTime(new Location(), new DateTime());
+		otService.getLocationAvailableTime(new Location(), LocalDate.now());
 	}
 
 	/**
 	 * @verifies throw APIException if availableStart attribute is not defined
-	 * @see OperationTheaterService#getLocationAvailableTime(org.openmrs.Location, org.joda.time.DateTime)
+	 * @see OperationTheaterService#getLocationAvailableTime(org.openmrs.Location, LocalDate)
 	 */
 	@Test(expected = APIException.class)
 	public void getLocationAvailableTime_shouldThrowAPIExceptionIfAvailableStartAttributeIsNotDefined() throws Exception {
@@ -430,12 +440,12 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 		location.setAttribute(start);
 
 		//call function under test
-		otService.getLocationAvailableTime(location, new DateTime());
+		otService.getLocationAvailableTime(location, LocalDate.now());
 	}
 
 	/**
 	 * @verifies throw APIException if availableEnd attribute is not defined
-	 * @see OperationTheaterService#getLocationAvailableTime(org.openmrs.Location, org.joda.time.DateTime)
+	 * @see OperationTheaterService#getLocationAvailableTime(org.openmrs.Location, LocalDate)
 	 */
 	@Test(expected = APIException.class)
 	public void getLocationAvailableTime_shouldThrowAPIExceptionIfAvailableEndAttributeIsNotDefined() throws Exception {
@@ -455,18 +465,18 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 		location.setAttribute(end);
 
 		//call function under test
-		otService.getLocationAvailableTime(location, new DateTime());
+		otService.getLocationAvailableTime(location, LocalDate.now());
 	}
 
 	/**
 	 * @verifies call surgeryDAO getScheduledSurgeries if parameter are not null
-	 * @see OperationTheaterService#getScheduledSurgeries(org.joda.time.DateTime, org.joda.time.DateTime)
+	 * @see OperationTheaterService#getScheduledSurgeries(LocalDate, LocalDate)
 	 */
 	@Test
 	public void getScheduledSurgeries_shouldCallSurgeryDAOGetScheduledSurgeriesIfParameterAreNotNull() throws Exception {
 
-		DateTime from = new DateTime();
-		DateTime to = from.plusDays(1);
+		LocalDate from = LocalDate.now();
+		LocalDate to = from.plusDays(1);
 
 		//call function under test
 		service.getScheduledSurgeries(from, to);
@@ -477,32 +487,32 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 
 	/**
 	 * @verifies return empty list if a parameter is null
-	 * @see OperationTheaterService#getScheduledSurgeries(org.joda.time.DateTime, org.joda.time.DateTime)
+	 * @see OperationTheaterService#getScheduledSurgeries(LocalDate, LocalDate)
 	 */
 	@Test
 	public void getScheduledSurgeries_shouldReturnEmptyListIfAParameterIsNull() throws Exception {
 		//call function under test
-		List<Surgery> result = service.getScheduledSurgeries(null, new DateTime());
+		List<Surgery> result = service.getScheduledSurgeries(null, LocalDate.now());
 
 		//verify
 		assertThat(result, hasSize(0));
-		verify(surgeryDAO, never()).getScheduledSurgeries(any(DateTime.class), any(DateTime.class));
+		verify(surgeryDAO, never()).getScheduledSurgeries(any(LocalDate.class), any(LocalDate.class));
 
 		//call function under test
-		result = service.getScheduledSurgeries(new DateTime(), null);
+		result = service.getScheduledSurgeries(LocalDate.now(), null);
 
 		//verify
 		assertThat(result, hasSize(0));
-		verify(surgeryDAO, never()).getScheduledSurgeries(any(DateTime.class), any(DateTime.class));
+		verify(surgeryDAO, never()).getScheduledSurgeries(any(LocalDate.class), any(LocalDate.class));
 	}
 
 	/**
 	 * @verifies call surgeryDAO getAllOngoingSurgeries if parameter are not null
-	 * @see OperationTheaterService#getAllOngoingSurgeries(org.joda.time.DateTime)
+	 * @see OperationTheaterService#getAllOngoingSurgeries(LocalDate)
 	 */
 	@Test
 	public void getAllOngoingSurgeries_shouldCallSurgeryDAOGetAllOngoingSurgeriesIfParameterAreNotNull() throws Exception {
-		DateTime dateTime = new DateTime();
+		LocalDate dateTime = LocalDate.now();
 		List<Surgery> expected = new ArrayList<Surgery>();
 		when(surgeryDAO.getAllOngoingSurgeries(dateTime)).thenReturn(expected);
 
@@ -515,7 +525,7 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 
 	/**
 	 * @verifies return empty list if dateTime is null
-	 * @see OperationTheaterService#getAllOngoingSurgeries(org.joda.time.DateTime)
+	 * @see OperationTheaterService#getAllOngoingSurgeries(LocalDate)
 	 */
 	@Test
 	public void getAllOngoingSurgeries_shouldReturnEmptyListIfDateTimeIsNull() throws Exception {
@@ -524,6 +534,6 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 
 		//verify
 		assertThat(result, hasSize(0));
-		verify(surgeryDAO, never()).getAllOngoingSurgeries(any(DateTime.class));
+		verify(surgeryDAO, never()).getAllOngoingSurgeries(any(LocalDate.class));
 	}
 }
