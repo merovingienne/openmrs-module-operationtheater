@@ -1,11 +1,13 @@
 package org.openmrs.module.operationtheater.scheduler.solver;
 
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.junit.Test;
 import org.openmrs.module.operationtheater.SchedulingData;
 import org.openmrs.module.operationtheater.Surgery;
 import org.openmrs.module.operationtheater.scheduler.domain.PlannedSurgery;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
+
+import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -42,7 +44,7 @@ public class MovablePlannedSurgerySelectionFilterTest {
 		//prepare
 		PlannedSurgery plannedSurgery = new PlannedSurgery();
 		Surgery surgery = new Surgery();
-		surgery.setDateStarted(new DateTime());
+		surgery.setDateStarted(LocalDateTime.now());
 		plannedSurgery.setSurgery(surgery);
 
 		//call method under test

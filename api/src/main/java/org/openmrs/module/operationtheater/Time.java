@@ -15,7 +15,7 @@ public class Time {
 //		return new DateTime();
 //	}
 
-	public LocalDate now() {
-		return ZonedDateTime.now().toLocalDate();
+	public ZonedDateTime now() {
+		return ZonedDateTime.now();
 	}
 }

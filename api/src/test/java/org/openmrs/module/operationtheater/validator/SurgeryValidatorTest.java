@@ -1,6 +1,6 @@
 package org.openmrs.module.operationtheater.validator;
 
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -14,6 +14,11 @@ import org.openmrs.module.operationtheater.Surgery;
 import org.openmrs.module.operationtheater.api.OperationTheaterService;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -52,8 +57,8 @@ public class SurgeryValidatorTest {
 		surgery.setPatient(patient);
 		surgery.setProcedure(new Procedure());
 		surgery.setSchedulingData(new SchedulingData());
-		DateTime refDate = new DateTime();
-		surgery.setDateCreated(refDate.toDate());
+		ZonedDateTime refDate = ZonedDateTime.now();
+		surgery.setDateCreated(Date.from(refDate.toInstant()));
 		//		surgery.setDateStarted(refDate.plusHours(1));
 		//		surgery.setDateFinished(refDate.plusHours(2));
 		return surgery;
@@ -181,7 +186,7 @@ public class SurgeryValidatorTest {
 	@Test
 	public void validate_shouldFailValidationIfDateStartedIsBeforeDateCreated() throws Exception {
 		Surgery surgery = createValidSurgery();
-		surgery.setDateStarted(new DateTime(surgery.getDateCreated()).minusHours(1));
+		surgery.setDateStarted(LocalDateTime.ofInstant(surgery.getDateCreated().toInstant(), ZoneId.systemDefault()).minusHours(1));
 		when(patientService.getPatient(1)).thenReturn(surgery.getPatient());
 		Surgery surgeryInDb = new Surgery();
 		when(otService.getSurgery(1)).thenReturn(surgeryInDb);
@@ -205,9 +210,9 @@ public class SurgeryValidatorTest {
 	@Test
 	public void validate_shouldFailValidationIfDateFinishedIsBeforeDateStarted() throws Exception {
 		Surgery surgery = createValidSurgery();
-		DateTime dateStarted = new DateTime();
-		surgery.setDateStarted(dateStarted);
-		surgery.setDateFinished(new DateTime().minusHours(1));
+		ZonedDateTime dateStarted = ZonedDateTime.now();
+		surgery.setDateStarted(dateStarted.toLocalDateTime());
+		surgery.setDateFinished(ZonedDateTime.now().minusHours(1).toLocalDateTime());
 		when(patientService.getPatient(1)).thenReturn(surgery.getPatient());
 		Surgery surgeryInDb = new Surgery();
 		when(otService.getSurgery(1)).thenReturn(surgeryInDb);
@@ -232,7 +237,7 @@ public class SurgeryValidatorTest {
 	public void validate_shouldFailValidationIfDateFinishedIsSetAndDateStartedIsNull() throws Exception {
 		Surgery surgery = createValidSurgery();
 		surgery.setDateStarted(null);
-		surgery.setDateFinished(new DateTime());
+		surgery.setDateFinished(ZonedDateTime.now().toLocalDateTime());
 		when(patientService.getPatient(1)).thenReturn(surgery.getPatient());
 		Surgery surgeryInDb = new Surgery();
 		when(otService.getSurgery(1)).thenReturn(surgeryInDb);

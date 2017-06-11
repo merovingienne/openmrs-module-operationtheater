@@ -2,10 +2,10 @@ package org.openmrs.module.operationtheater.fragment.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.Minutes;
-import org.joda.time.format.DateTimeFormatter;
+//import org.joda.time.DateTime;
+//import org.joda.time.LocalTime;
+//import org.joda.time.Minutes;
+//import org.joda.time.format.DateTimeFormatter;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationTag;
@@ -36,6 +36,9 @@ import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -83,7 +86,7 @@ public class SchedulingFragmentController {
 		List<AppointmentBlock> blocks = appointmentService.getAppointmentBlocks(start, end, locationsString, null, null);
 
 		//build an index to find appointmentBlock with location and startDate
-		Map<Location, Map<DateTime, AppointmentBlock>> indexedApptBlocks = indexApptBlocks(locations, blocks);
+		Map<Location, Map<ZonedDateTime, AppointmentBlock>> indexedApptBlocks = indexApptBlocks(locations, blocks);
 
 		//iterate over all location and dates and add events for the calendar
 		List<CalendarEvent> events = new ArrayList<CalendarEvent>();
@@ -505,14 +508,15 @@ public class SchedulingFragmentController {
 	 * @param appointmentBlocks
 	 * @return
 	 */
-	private Map<Location, Map<DateTime, AppointmentBlock>> indexApptBlocks(List<Location> locations,
+	private Map<Location, Map<ZonedDateTime, AppointmentBlock>> indexApptBlocks(List<Location> locations,
 	                                                                       List<AppointmentBlock> appointmentBlocks) {
-		Map<Location, Map<DateTime, AppointmentBlock>> map = new HashMap<Location, Map<DateTime, AppointmentBlock>>();
+		Map<Location, Map<ZonedDateTime, AppointmentBlock>> map = new HashMap<Location, Map<ZonedDateTime, AppointmentBlock>>();
 		for (Location location : locations) {
-			map.put(location, new HashMap<DateTime, AppointmentBlock>());
+			map.put(location, new HashMap<ZonedDateTime, AppointmentBlock>());
 		}
 		for (AppointmentBlock appointmentBlock : appointmentBlocks) {
-			DateTime dateTime = new DateTime(appointmentBlock.getStartDate()).withTimeAtStartOfDay();
+			ZonedDateTime dateTime = ZonedDateTime.ofInstant(appointmentBlock.getStartDate().toInstant(),
+																ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
 			map.get(appointmentBlock.getLocation()).put(dateTime, appointmentBlock);
 		}
 		return map;

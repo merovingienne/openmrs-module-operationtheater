@@ -5,10 +5,12 @@ import org.openmrs.Provider;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 
 import org.openmrs.module.operationtheater.attribute.converter.time.LocalDateAttributeConverter;
+import org.openmrs.module.operationtheater.attribute.converter.time.LocalDateTimeAttributeConverter;
 
 /**
  * Defines a Surgery in the system.
@@ -31,12 +33,12 @@ public class Surgery extends BaseOpenmrsDataJPA {
 	private Procedure procedure;
 
 	@Column(name = "date_started")
-	@Convert( converter = LocalDateAttributeConverter.class)
-	private LocalDate dateStarted;
+	@Convert( converter = LocalDateTimeAttributeConverter.class)
+	private LocalDateTime dateStarted;
 
 	@Column(name = "date_finished")
-	@Convert( converter = LocalDateAttributeConverter.class)
-	private LocalDate dateFinished;
+	@Convert( converter = LocalDateTimeAttributeConverter.class)
+	private LocalDateTime dateFinished;
 
 	@OneToOne(cascade = { CascadeType.ALL })
 	@JoinColumn(name = "scheduling_data_id")
@@ -102,19 +104,19 @@ public class Surgery extends BaseOpenmrsDataJPA {
 		this.surgicalTeam = surgicalTeam;
 	}
 
-	public LocalDate getDateFinished() {
+	public LocalDateTime getDateFinished() {
 		return dateFinished;
 	}
 
-	public void setDateFinished(LocalDate dateFinished) {
+	public void setDateFinished(LocalDateTime dateFinished) {
 		this.dateFinished = dateFinished;
 	}
 
-	public LocalDate getDateStarted() {
+	public LocalDateTime getDateStarted() {
 		return dateStarted;
 	}
 
-	public void setDateStarted(LocalDate dateStarted) {
+	public void setDateStarted(LocalDateTime dateStarted) {
 		this.dateStarted = dateStarted;
 	}
 }

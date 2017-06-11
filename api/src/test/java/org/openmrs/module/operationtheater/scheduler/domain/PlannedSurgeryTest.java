@@ -1,7 +1,7 @@
 package org.openmrs.module.operationtheater.scheduler.domain;
 
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
+//import org.joda.time.DateTime;
+//import org.joda.time.Interval;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -11,6 +11,12 @@ import org.openmrs.module.operationtheater.Procedure;
 import org.openmrs.module.operationtheater.SchedulingData;
 import org.openmrs.module.operationtheater.Surgery;
 import org.openmrs.module.operationtheater.api.OperationTheaterService;
+import org.threeten.extra.Interval;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -30,7 +36,7 @@ public class PlannedSurgeryTest {
 
 	/**
 	 * @verifies set start and update end accordingly
-	 * @see PlannedSurgery#setStart(DateTime)
+	 * @see PlannedSurgery#setStart(java.time.ZonedDateTime)
 	 */
 	@Test
 	public void setStart_shouldSetStartAndUpdateEndAccordingly() throws Exception {
@@ -41,8 +47,8 @@ public class PlannedSurgeryTest {
 		PlannedSurgery plannedSurgery = new PlannedSurgery();
 		plannedSurgery.setSurgery(surgery);
 
-		DateTime now = new DateTime();
-		DateTime expectedEnd = now.plusMinutes(123 + 45);
+		ZonedDateTime now = ZonedDateTime.now();
+		ZonedDateTime expectedEnd = now.plusMinutes(123 + 45);
 
 		//call function under test
 		plannedSurgery.setStart(now);
@@ -57,7 +63,7 @@ public class PlannedSurgeryTest {
 	 */
 	@Test
 	public void isOverlapping_shouldReturnIfTheTwoIntervalsOverlap() throws Exception {
-		DateTime start = new DateTime();
+		ZonedDateTime start = ZonedDateTime.now();
 		Surgery surgery = createSurgery();
 
 		PlannedSurgery ps1 = new PlannedSurgery();
@@ -87,8 +93,8 @@ public class PlannedSurgeryTest {
 	 */
 	@Test
 	public void isOverlapping_shouldReturnFalseIfAnyOfTheDateObjectAreNull() throws Exception {
-		DateTime start = new DateTime();
-		DateTime end = start.plusMinutes(5);
+		ZonedDateTime start = ZonedDateTime.now();
+		ZonedDateTime end = start.plusMinutes(5);
 
 		Surgery surgery = createSurgery();
 
@@ -120,7 +126,7 @@ public class PlannedSurgeryTest {
 
 	/**
 	 * set up surgery and procedure  - this is needed to calculate end time inside
-	 * {@link PlannedSurgery#setStart(DateTime)} method
+	 * {@link PlannedSurgery#setStart(ZonedDateTime)} method
 	 *
 	 * @return
 	 */
@@ -144,8 +150,8 @@ public class PlannedSurgeryTest {
 		Surgery surgery = new Surgery();
 		PlannedSurgery plannedSurgery = new PlannedSurgery();
 		plannedSurgery.setSurgery(surgery);
-		plannedSurgery.setStart(new DateTime(), false);
-		plannedSurgery.setEnd(new DateTime().plusHours(2));
+		plannedSurgery.setStart(ZonedDateTime.now(), false);
+		plannedSurgery.setEnd(ZonedDateTime.now().plusHours(2));
 		plannedSurgery.setLocation(new Location());
 
 		//call function under test
@@ -156,8 +162,8 @@ public class PlannedSurgeryTest {
 
 		assertNotNull(captor);
 		SchedulingData result = captor.getValue().getSchedulingData();
-		assertThat(result.getStart(), is(plannedSurgery.getStart()));
-		assertThat(result.getEnd(), is(plannedSurgery.getEnd()));
+		assertThat(result.getStart(), is(plannedSurgery.getStart().toLocalDateTime()));
+		assertThat(result.getEnd(), is(plannedSurgery.getEnd().toLocalDateTime()));
 		assertThat(result.getLocation(), is(plannedSurgery.getLocation()));
 	}
 
@@ -171,8 +177,8 @@ public class PlannedSurgeryTest {
 
 		SchedulingData schedulingData = new SchedulingData();
 		schedulingData.setLocation(new Location());
-		schedulingData.setStart(new DateTime());
-		schedulingData.setEnd(new DateTime().plusHours(1));
+		schedulingData.setStart(LocalDateTime.now());
+		schedulingData.setEnd(LocalDateTime.now().plusHours(1));
 
 		PlannedSurgery plannedSurgery = new PlannedSurgery();
 		plannedSurgery.setLocation(null);
@@ -198,8 +204,8 @@ public class PlannedSurgeryTest {
 	@Test
 	public void isOutsideAvailableTimes_shouldReturnTrueIfLocationStartOrEndVariablesAreNull() throws Exception {
 		PlannedSurgery surgery = new PlannedSurgery();
-		surgery.setStart(new DateTime(), false);
-		surgery.setEnd(new DateTime());
+		surgery.setStart(ZonedDateTime.now(), false);
+		surgery.setEnd(ZonedDateTime.now());
 
 		//call function under test
 		boolean result = surgery.isOutsideAvailableTimes();
@@ -216,7 +222,7 @@ public class PlannedSurgeryTest {
 		//verify
 		assertThat(result, is(true));
 
-		surgery.setStart(new DateTime(), false);
+		surgery.setStart(ZonedDateTime.now(), false);
 		surgery.setEnd(null);
 
 		//call function under test
@@ -234,15 +240,15 @@ public class PlannedSurgeryTest {
 	public void isOutsideAvailableTimes_shouldReturnIfCurrentSchedulingIsOutsideAvailableTimes()
 			throws Exception {
 		OperationTheaterService mockedService = Mockito.mock(OperationTheaterService.class);
-		Interval interval = new Interval(new DateTime(), new DateTime().plusHours(5));
-		when(mockedService.getLocationAvailableTime(any(Location.class), any(DateTime.class))).thenReturn(interval);
+		Interval interval = Interval.of(ZonedDateTime.now().toInstant(), ZonedDateTime.now().plusHours(5).toInstant());
+		when(mockedService.getLocationAvailableTime(any(Location.class), any(LocalDate.class))).thenReturn(interval);
 
 		PlannedSurgery surgery = new PlannedSurgery();
 		surgery.setLocation(new Location());
 		Whitebox.setInternalState(surgery, "otService", mockedService);
 
-		surgery.setStart(new DateTime().minusHours(1), false);
-		surgery.setEnd(new DateTime().plusHours(1));
+		surgery.setStart(ZonedDateTime.now().minusHours(1), false);
+		surgery.setEnd(ZonedDateTime.now().plusHours(1));
 
 		//call function under test
 		boolean result = surgery.isOutsideAvailableTimes();
@@ -250,8 +256,8 @@ public class PlannedSurgeryTest {
 		//verify
 		assertThat(result, is(true));
 
-		surgery.setStart(new DateTime().plusMinutes(30), false);
-		surgery.setEnd(interval.getEnd());
+		surgery.setStart(ZonedDateTime.now().plusMinutes(30), false);
+		surgery.setEnd(ZonedDateTime.ofInstant(interval.getEnd(), ZoneId.systemDefault()));
 
 		//call function under test
 		result = surgery.isOutsideAvailableTimes();
@@ -321,8 +327,8 @@ public class PlannedSurgeryTest {
 		//prepare
 		PlannedSurgery plannedSurgery = new PlannedSurgery();
 		plannedSurgery.setLocation(new Location());
-		plannedSurgery.setStart(new DateTime(), false);
-		plannedSurgery.setEnd(new DateTime());
+		plannedSurgery.setStart(ZonedDateTime.now(), false);
+		plannedSurgery.setEnd(ZonedDateTime.now());
 
 		//call method under test
 		plannedSurgery.setPreviousTimetableEntry(null);
@@ -342,8 +348,8 @@ public class PlannedSurgeryTest {
 		//prepare
 		PlannedSurgery previous = new PlannedSurgery();
 		previous.setLocation(new Location());
-		previous.setStart(new DateTime().minusMinutes(30), false);
-		previous.setEnd(new DateTime());
+		previous.setStart(ZonedDateTime.now().minusMinutes(30), false);
+		previous.setEnd(ZonedDateTime.now());
 
 		PlannedSurgery plannedSurgery = new PlannedSurgery();
 		Procedure procedure = new Procedure();
@@ -372,15 +378,15 @@ public class PlannedSurgeryTest {
 		//prepare
 		PlannedSurgery previous = new PlannedSurgery();
 		previous.setLocation(new Location());
-		previous.setStart(new DateTime().minusMinutes(30), false);
-		previous.setEnd(new DateTime());
+		previous.setStart(ZonedDateTime.now().minusMinutes(30), false);
+		previous.setEnd(ZonedDateTime.now());
 
 		PlannedSurgery plannedSurgery = new PlannedSurgery();
 		Procedure procedure = new Procedure();
 		procedure.setInterventionDuration(35);
 		procedure.setOtPreparationDuration(25);
 		Surgery surgery = new Surgery();
-		surgery.setDateStarted(new DateTime().plusMinutes(10));
+		surgery.setDateStarted(ZonedDateTime.now().plusMinutes(10).toLocalDateTime());
 		surgery.setProcedure(procedure);
 		plannedSurgery.setSurgery(surgery);
 
@@ -390,6 +396,6 @@ public class PlannedSurgeryTest {
 		//verify
 		assertThat(plannedSurgery.getLocation(), equalTo(previous.getLocation()));
 		assertThat(plannedSurgery.getStart(), equalTo(previous.getEnd()));
-		assertThat(plannedSurgery.getEnd(), equalTo(surgery.getDateStarted().plusMinutes(35)));
+		assertThat(plannedSurgery.getEnd().toLocalDateTime(), equalTo(surgery.getDateStarted().plusMinutes(35)));
 	}
 }

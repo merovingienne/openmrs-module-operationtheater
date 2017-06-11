@@ -1,6 +1,6 @@
 package org.openmrs.module.operationtheater.validator;
 
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +18,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 
 import static org.hamcrest.Matchers.is;
@@ -52,8 +53,8 @@ public class SchedulingDataValidatorTest {
 	private SchedulingData createValidSchedulingData() {
 		SchedulingData data = new SchedulingData();
 		data.setDateLocked(false);
-		data.setStart(new DateTime());
-		data.setEnd(new DateTime().plusHours(1));
+		data.setStart(LocalDateTime.now());
+		data.setEnd(LocalDateTime.now().plusHours(1));
 
 		Location location = new Location();
 		location.setId(1);
@@ -245,7 +246,7 @@ public class SchedulingDataValidatorTest {
 	@Test
 	public void validate_shouldFailValidationIfStartIsAfterEnd() throws Exception {
 		SchedulingData data = createValidSchedulingData();
-		DateTime end = data.getStart().minusHours(1);
+		LocalDateTime end = data.getStart().minusHours(1);
 		data.setEnd(end);
 
 		//mock service layer

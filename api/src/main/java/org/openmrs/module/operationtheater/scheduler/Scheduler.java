@@ -2,9 +2,9 @@ package org.openmrs.module.operationtheater.scheduler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.joda.time.Minutes;
+//import org.joda.time.DateTime;
+//import org.joda.time.Interval;
+//import org.joda.time.Minutes;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
 import org.openmrs.api.LocationService;
@@ -25,10 +25,14 @@ import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 import org.optaplanner.core.config.solver.XmlSolverFactory;
 
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+
+import org.threeten.extra.Interval;
 
 public enum Scheduler {
 
@@ -157,7 +161,7 @@ public enum Scheduler {
 	 * @should setup the initial solution if a surgery is currently performed
 	 */
 	Timetable setupInitialSolution(int planningWindowLength) {
-		DateTime lastPlannedDay = time.now().plusDays(planningWindowLength);
+		ZonedDateTime lastPlannedDay = time.now().plusDays(planningWindowLength);
 
 		//get all uncompleted surgeries
 		List<Surgery> surgeries = otService.getAllUncompletedSurgeries();
@@ -185,29 +189,31 @@ public enum Scheduler {
 	 * @param lastPlannedDay
 	 * @return
 	 */
-	private List<Anchor> getChainAnchors(List<Surgery> surgeries, List<Location> locations, DateTime lastPlannedDay) {
+	private List<Anchor> getChainAnchors(List<Surgery> surgeries, List<Location> locations, ZonedDateTime lastPlannedDay) {
 		List<Anchor> anchors = new ArrayList<Anchor>();
 
 		//now
-		DateTime now = time.now();
+		ZonedDateTime now = time.now();
 		for (Location location : locations) {
-			Interval available = otService.getLocationAvailableTime(location, now);
-			if (now.isBefore(available.getEnd())) {
-				DateTime start = now.isAfter(available.getStart()) ? now : available.getStart();
+			Interval available = otService.getLocationAvailableTime(location, now.toLocalDate());
+			if (available.getEnd().isAfter(now.toInstant())) {
+				ZonedDateTime start = available.getStart().isBefore(now.toInstant()) ?
+						now : ZonedDateTime.ofInstant(available.getStart(), ZoneId.systemDefault());
 				//if a surgery has already been started set anchor to the start time
 				Surgery alreadyStarted = getStartedSurgery(surgeries, location);
 				if (alreadyStarted != null) {
-					start = alreadyStarted.getDateStarted();
+					start = ZonedDateTime.of(alreadyStarted.getDateStarted(), ZoneId.systemDefault());
 				}
 				anchors.add(new Anchor(location, start));
 			}
 		}
 
 		//remaining planning period
-		for (DateTime day = time.now().plusDays(1); day.isBefore(lastPlannedDay); day = day.plusDays(1)) {
+		for (ZonedDateTime day = time.now().plusDays(1); day.isBefore(lastPlannedDay); day = day.plusDays(1)) {
 			for (Location location : locations) {
-				Interval available = otService.getLocationAvailableTime(location, day);
-				anchors.add(new Anchor(location, available.getStart()));
+				Interval available = otService.getLocationAvailableTime(location, day.toLocalDate());
+				anchors.add(new Anchor(location,
+						ZonedDateTime.ofInstant(available.getStart(), ZoneId.systemDefault())));
 			}
 		}
 
@@ -215,8 +221,9 @@ public enum Scheduler {
 		for (Surgery surgery : surgeries) {
 			SchedulingData schedulingData = surgery.getSchedulingData();
 			if (schedulingData != null && schedulingData.getDateLocked() && schedulingData.getStart()
-					.isBefore(lastPlannedDay)) {
-				anchors.add(new Anchor(schedulingData.getLocation(), schedulingData.getStart()));
+					.isBefore(lastPlannedDay.toLocalDateTime())) {
+				anchors.add(new Anchor(schedulingData.getLocation(),
+						ZonedDateTime.of(schedulingData.getStart(), ZoneId.systemDefault())));
 			}
 		}
 
@@ -238,16 +245,17 @@ public enum Scheduler {
 				next = null;
 			}
 
-			DateTime end = null;
-			if (next != null && anchor.getLocation().equals(next.getLocation()) && anchor.getStart().withTimeAtStartOfDay()
-					.equals(next.getStart().withTimeAtStartOfDay())) {
+			ZonedDateTime end = null;
+			if (next != null && anchor.getLocation().equals(next.getLocation()) && anchor.getStart().truncatedTo(ChronoUnit.DAYS)
+					.equals(next.getStart().truncatedTo(ChronoUnit.DAYS))) {
 				//chain end determined by start time of next anchor
 				end = next.getStart();
 			} else {
 				//chain end determined by end of available time at this day
-				end = otService.getLocationAvailableTime(anchor.getLocation(), anchor.getStart()).getEnd();
+				end = ZonedDateTime.ofInstant(    otService.getLocationAvailableTime(anchor.getLocation(),
+												anchor.getStart().toLocalDate()).getEnd(),ZoneId.systemDefault()   );
 			}
-			int minutes = Minutes.minutesBetween(anchor.getStart(), end).getMinutes();
+			int minutes = (int) Duration.between(anchor.getStart(), end).toMinutes();
 			anchor.setMaxChainLengthInMinutes(minutes);
 		}
 
@@ -300,7 +308,7 @@ public enum Scheduler {
 	 * @return
 	 */
 	private List<PlannedSurgery> setupPlannedSurgeryChains(List<Surgery> surgeries, List<Anchor> anchors,
-	                                                       DateTime lastPlannedDay) {
+	                                                       ZonedDateTime lastPlannedDay) {
 		List<PlannedSurgery> plannedSurgeries = new ArrayList<PlannedSurgery>();
 
 		//set location start time and location of last solution
@@ -309,7 +317,7 @@ public enum Scheduler {
 			plannedSurgery.setSurgery(surgery);
 			SchedulingData scheduling = surgery.getSchedulingData();
 			if (scheduling != null && scheduling.getStart() != null) {
-				plannedSurgery.setStart(scheduling.getStart());
+				plannedSurgery.setStart(  ZonedDateTime.of(scheduling.getStart(), ZoneId.systemDefault()));
 				plannedSurgery.setLocation(scheduling.getLocation());
 			}
 			//only add surgeries that are unscheduled or within the planning window

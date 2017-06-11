@@ -1,9 +1,12 @@
 package org.openmrs.module.operationtheater.scheduler.domain;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+//import org.joda.time.DateTime;
+//import org.joda.time.format.DateTimeFormat;
+//import org.joda.time.format.DateTimeFormatter;
 import org.openmrs.Location;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Anchor point for a planning chain that is needed by optaplanner library
@@ -12,7 +15,7 @@ public class Anchor implements TimetableEntry {
 
 	private Location location;
 
-	private DateTime start;
+	private ZonedDateTime start;
 
 	private TimetableEntry nextTimeTableEntry;
 
@@ -21,7 +24,7 @@ public class Anchor implements TimetableEntry {
 	 */
 	private int maxChainLengthInMinutes;
 
-	public Anchor(Location location, DateTime start) {
+	public Anchor(Location location, ZonedDateTime start) {
 		this.location = location;
 		this.start = start;
 	}
@@ -45,12 +48,12 @@ public class Anchor implements TimetableEntry {
 	}
 
 	@Override
-	public DateTime getStart() {
+	public ZonedDateTime getStart() {
 		return start;
 	}
 
 	@Override
-	public DateTime getEnd() {
+	public ZonedDateTime getEnd() {
 		return start;
 	}
 
@@ -74,8 +77,8 @@ public class Anchor implements TimetableEntry {
 
 	@Override
 	public String toString() {
-		DateTimeFormatter fmt = DateTimeFormat.forPattern("dd.MM HH:mm");
-		String startStr = start == null ? "null      " : fmt.print(start);
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd.MM HH:mm");
+		String startStr = start == null ? "null      " : fmt.format(start);
 		String locationName = location != null ? location.getName() : "null";
 		return "Anchor{" +
 				" " + locationName +

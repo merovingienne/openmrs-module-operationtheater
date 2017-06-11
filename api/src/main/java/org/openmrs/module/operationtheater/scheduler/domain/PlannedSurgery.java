@@ -123,7 +123,7 @@ public class PlannedSurgery implements TimetableEntry {
 		//if surgery has already been started correct surgery end time, because otPreparation has already been performed
 		if (surgery.getDateStarted() != null) {
 			int interventionDuration = surgery.getProcedure().getInterventionDuration();
-			end = ZonedDateTime.from(surgery.getDateStarted().atStartOfDay(ZoneId.systemDefault())).plusMinutes(interventionDuration);
+			end = ZonedDateTime.of(surgery.getDateStarted(), ZoneId.systemDefault()).plusMinutes(interventionDuration);
 		}
 		location = previousTimetableEntry.getLocation();
 	}

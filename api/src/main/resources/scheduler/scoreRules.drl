@@ -3,15 +3,20 @@ package scheduler;
 
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
 
-import org.joda.time.Interval;
+// import org.joda.time.Interval;
 import org.openmrs.module.operationtheater.scheduler.domain.PlannedSurgery;
 import org.openmrs.module.operationtheater.scheduler.domain.Anchor;
 import org.openmrs.module.operationtheater.scheduler.solver.SurgeryConflict;
 
-import org.joda.time.DateTime;
-import java.util.Date
-import org.joda.time.Period
-import org.joda.time.Hours;
+// import org.joda.time.DateTime;
+import java.util.Date;
+// import org.joda.time.Period
+// import org.joda.time.Hours;
+
+import java.time.ZonedDateTime;
+import java.time.Duration;
+import java.time.ZoneId;
+
 
 global HardSoftScoreHolder scoreHolder;
 
@@ -71,8 +76,8 @@ rule "firstComeFirstServed"
     when
         $surgery: PlannedSurgery($start : start, start != null, location != null)
     then
-        DateTime $created = new DateTime($surgery.getSurgery().getDateCreated().getTime());
-        int hours = Hours.hoursBetween($created, $start).getHours();
+        ZonedDateTime $created = ZonedDateTime.ofInstant($surgery.getSurgery().getDateCreated().toInstant(), ZoneId.systemDefault());
+        int hours = Duration.between($created, $start).toHours();
 
         scoreHolder.addSoftConstraintMatch(kcontext, -hours);
 end
