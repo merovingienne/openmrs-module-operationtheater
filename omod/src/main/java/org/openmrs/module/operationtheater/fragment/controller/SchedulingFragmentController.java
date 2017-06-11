@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 //import org.joda.time.LocalTime;
 //import org.joda.time.Minutes;
 //import org.joda.time.format.DateTimeFormatter;
+//import org.joda.time.LocalDateTime;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationTag;
@@ -31,13 +32,14 @@ import org.openmrs.ui.framework.annotation.SpringBean;
 import org.openmrs.ui.framework.fragment.action.FailureResult;
 import org.openmrs.ui.framework.fragment.action.FragmentActionResult;
 import org.openmrs.ui.framework.fragment.action.SuccessResult;
+import org.springframework.cglib.core.Local;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,7 +51,7 @@ import java.util.Map;
 
 public class SchedulingFragmentController {
 
-	private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Context.getLocale());
+	private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 	private final SchedulingDataValidator schedulingDataValidator = new SchedulingDataValidator();
 
@@ -86,19 +88,20 @@ public class SchedulingFragmentController {
 		List<AppointmentBlock> blocks = appointmentService.getAppointmentBlocks(start, end, locationsString, null, null);
 
 		//build an index to find appointmentBlock with location and startDate
-		Map<Location, Map<ZonedDateTime, AppointmentBlock>> indexedApptBlocks = indexApptBlocks(locations, blocks);
+		Map<Location, Map<LocalDateTime, AppointmentBlock>> indexedApptBlocks = indexApptBlocks(locations, blocks);
 
 		//iterate over all location and dates and add events for the calendar
 		List<CalendarEvent> events = new ArrayList<CalendarEvent>();
-		DateTime endDate = new DateTime(end);
+		LocalDateTime endDate = LocalDateTime.ofInstant(end.toInstant(), ZoneId.systemDefault());
 		for (Location location : locations) {
-			for (DateTime startDate = new DateTime(start); startDate.isBefore(endDate); startDate = startDate.plusDays(1)) {
+			for (LocalDateTime startDate = LocalDateTime.ofInstant(start.toInstant(), ZoneId.systemDefault());
+				 					startDate.isBefore(endDate); startDate = startDate.plusDays(1)) {
 				addAvailableTimesToEventList(events, startDate, indexedApptBlocks, location, resources);
 			}
 		}
 
 		//add surgeries
-		List<Surgery> surgeryList = otService.getScheduledSurgeries(new DateTime(start), endDate);
+		List<Surgery> surgeryList = otService.getScheduledSurgeries(LocalDateTime.ofInstant(start.toInstant(), ZoneId.systemDefault()), endDate);
 		for (Surgery surgery : surgeryList) {
 			CalendarEvent event = getSurgeryCalendarEvent(resources, surgery);
 			events.add(event);
@@ -175,10 +178,10 @@ public class SchedulingFragmentController {
 			throw new IllegalArgumentException("No surgery entry found for surgeryUuid: " + surgeryUuid);
 		}
 
-		DateTime start = new DateTime(scheduledDateTime);
+		LocalDateTime start = LocalDateTime.ofInstant(scheduledDateTime.toInstant(), ZoneId.systemDefault());
 		Procedure p = surgery.getProcedure();
 		int duration = p.getInterventionDuration() + p.getOtPreparationDuration();
-		DateTime end = start.plusMinutes(duration);
+		LocalDateTime end = start.plusMinutes(duration);
 
 		SchedulingData schedulingData = surgery.getSchedulingData();
 		schedulingData.setDateLocked(lockedDate);
@@ -219,7 +222,9 @@ public class SchedulingFragmentController {
 	                                 @SpringBean("locationService") LocationService locationService,
 	                                 @SpringBean AppointmentService appointmentService) throws Exception {
 
-		if (available && new DateTime(start).isAfter(new DateTime(end))) {
+		if (available && (LocalDateTime.ofInstant(start.toInstant(), ZoneId.systemDefault())
+							.isAfter(LocalDateTime.ofInstant(end.toInstant(), ZoneId.systemDefault())) )
+				) {
 			throw new IllegalArgumentException("start date must be before end date"); //TODO send meaningful error message
 		}
 
@@ -229,13 +234,13 @@ public class SchedulingFragmentController {
 			throw new IllegalArgumentException("no location found for uuid: " + uuid); //TODO send meaningful error message
 		}
 
-		DateTime startOfDay = new DateTime(start).withTimeAtStartOfDay();
+		LocalDateTime startOfDay = LocalDateTime.ofInstant(start.toInstant(), ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
 
 		AppointmentBlock block = getOrCreateAppointmentBlock(appointmentService, location, startOfDay);
 
 		if (!available) {
-			block.setStartDate(startOfDay.toDate());
-			block.setEndDate(startOfDay.toDate());
+			block.setStartDate(Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant()));
+			block.setEndDate(Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant()));
 		} else {
 			block.setStartDate(start);
 			block.setEndDate(end);
@@ -260,7 +265,7 @@ public class SchedulingFragmentController {
 	                                      @SpringBean("patientService") PatientService patientService) {
 		SimpleObject returnValue = new SimpleObject();
 
-		List<Surgery> ongoingSurgeries = otService.getAllOngoingSurgeries(time.now());
+		List<Surgery> ongoingSurgeries = otService.getAllOngoingSurgeries(time.now().toLocalDateTime());
 		//get operation theaters
 		LocationTag tag = locationService.getLocationTagByUuid(OTMetadata.LOCATION_TAG_OPERATION_THEATER_UUID);
 		List<Location> locations = locationService.getLocationsByTag(tag);
@@ -271,10 +276,10 @@ public class SchedulingFragmentController {
 		}
 
 		Surgery earliestFinishingSurgery = null;
-		DateTime earliestFinishingTime = time.now().plusDays(1);
+		LocalDateTime earliestFinishingTime = time.now().toLocalDateTime().plusDays(1);
 		for (Surgery surgery : ongoingSurgeries) {
 			int interventionDuration = surgery.getProcedure().getInterventionDuration();
-			DateTime finishingTime = surgery.getDateStarted().plusMinutes(interventionDuration);
+			LocalDateTime finishingTime = surgery.getDateStarted().plusMinutes(interventionDuration);
 			if (finishingTime.isBefore(earliestFinishingTime)) {
 				earliestFinishingSurgery = surgery;
 				earliestFinishingTime = finishingTime;
@@ -287,19 +292,20 @@ public class SchedulingFragmentController {
 		}
 
 		Location location = null;
-		DateTime plannedStart = null;
+		LocalDateTime plannedStart = null;
 		String resultMessage;
 		if (locations.size() != 0) {
 			//found a free operating theater
 			location = locations.get(0);
-			plannedStart = time.now();
+			plannedStart = time.now().toLocalDateTime();
 			returnValue.put("location", location.getName());
 			returnValue.put("waitingTime", 0);
 		} else {
 			//next free operating theater determined
+			// nullable earliestFinishingSurgery?
 			location = earliestFinishingSurgery.getSchedulingData().getLocation();
 			plannedStart = earliestFinishingTime;
-			int availableInMinutes = Minutes.minutesBetween(time.now(), earliestFinishingTime).getMinutes();
+			int availableInMinutes = (int) Duration.between(time.now().toLocalDateTime(), earliestFinishingTime).toMinutes();
 			returnValue.put("location", location.getName());
 			returnValue.put("waitingTime", availableInMinutes);
 		}
@@ -344,8 +350,8 @@ public class SchedulingFragmentController {
 				|| scheduling.getLocation() == null) {
 			return null;
 		}
-		String startStr = dateFormatter.format(scheduling.getStart().toDate());
-		String endStr = dateFormatter.format(scheduling.getEnd().toDate());
+		String startStr = dateFormatter.format(scheduling.getStart());
+		String endStr = dateFormatter.format(scheduling.getEnd());
 		String patientName = surgery.getPatient().getFamilyName() + " " + surgery.getPatient().getGivenName();
 		String procedure = surgery.getProcedure().getName();
 		String surgeryUuid = surgery.getUuid();
@@ -390,10 +396,12 @@ public class SchedulingFragmentController {
 	 * @throws Exception
 	 */
 	private AppointmentBlock getOrCreateAppointmentBlock(AppointmentService appointmentService, Location location,
-	                                                     DateTime midnight) throws Exception {
+	                                                     LocalDateTime midnight) throws Exception {
 		AppointmentBlock block = new AppointmentBlock();
 		List<AppointmentBlock> blocks = appointmentService
-				.getAppointmentBlocks(midnight.toDate(), midnight.plusDays(1).minusSeconds(1).toDate(),
+				.getAppointmentBlocks(
+						Date.from(midnight.atZone(ZoneId.systemDefault()).toInstant()),
+						Date.from(midnight.plusDays(1).minusSeconds(1).atZone(ZoneId.systemDefault()).toInstant()),
 						String.valueOf(location.getId()), null, null);
 		if (blocks.size() > 1) {
 			throw new IllegalStateException(
@@ -423,19 +431,19 @@ public class SchedulingFragmentController {
 	 * @param location
 	 * @param resources
 	 */
-	private void addAvailableTimesToEventList(List<CalendarEvent> events, DateTime startDate,
-	                                          Map<Location, Map<DateTime, AppointmentBlock>> indexedApptBlocks,
+	private void addAvailableTimesToEventList(List<CalendarEvent> events, LocalDateTime startDate,
+	                                          Map<Location, Map<LocalDateTime, AppointmentBlock>> indexedApptBlocks,
 	                                          Location location, List<String> resources) {
 
-		AppointmentBlock block = indexedApptBlocks.get(location).get(startDate.withTimeAtStartOfDay());
+		AppointmentBlock block = indexedApptBlocks.get(location).get(startDate);
 		//convention: resourceId = element array index + 1 - TODO thats a bit hacky -> refactor that
 		int resourceId = resources.indexOf(location.getName()) + 1;
 
 		String start = "";
 		String end = "";
 		if (block != null) {
-			start = dateFormatter.format(block.getStartDate());
-			end = dateFormatter.format(block.getEndDate());
+			start = dateFormatter.format(LocalDateTime.ofInstant(block.getStartDate().toInstant(), ZoneId.systemDefault()));
+			end = dateFormatter.format(LocalDateTime.ofInstant(block.getEndDate().toInstant(), ZoneId.systemDefault()));
 		} else {
 			//no appointmentBlock found -> use default value (LocationAttribute)
 			LocationAttribute defaultBegin = getAttributeByUuid(location.getActiveAttributes(),
@@ -448,16 +456,17 @@ public class SchedulingFragmentController {
 			}
 
 			DateTimeFormatter timeFormatter = OTMetadata.AVAILABLE_TIME_FORMATTER;
-			LocalTime beginTime = LocalTime.parse((String) defaultBegin.getValue(), timeFormatter);
+			LocalDateTime beginTime = LocalDateTime.parse((String) defaultBegin.getValue(), timeFormatter);
 			LocalTime endTime = LocalTime.parse((String) defaultEnd.getValue(), timeFormatter);
 
 			start = dateFormatter
-					.format(startDate.withTime(beginTime.getHourOfDay(), beginTime.getMinuteOfHour(), 0, 0).toDate());
-			end = dateFormatter.format(startDate.withTime(endTime.getHourOfDay(), endTime.getMinuteOfHour(), 0, 0).toDate());
+					.format(startDate.withHour(beginTime.getHour()).withMinute(beginTime.getMinute()).truncatedTo(ChronoUnit.MINUTES));
+			end = dateFormatter.
+					format(startDate.withHour(endTime.getHour()).withMinute(endTime.getMinute()).truncatedTo(ChronoUnit.MINUTES));
 		}
 
-		String beginOfDay = dateFormatter.format(startDate.toDate());
-		String endOfDay = dateFormatter.format(startDate.plusHours(24).minusMinutes(1).toDate());
+		String beginOfDay = dateFormatter.format(startDate);
+		String endOfDay = dateFormatter.format(startDate.plusHours(24).minusMinutes(1));
 		if (start.equals(end)) {
 			//location is not available for this day
 			CalendarEvent event = new CalendarEvent("", beginOfDay, endOfDay, beginOfDay, beginOfDay, resourceId, true);
@@ -508,14 +517,14 @@ public class SchedulingFragmentController {
 	 * @param appointmentBlocks
 	 * @return
 	 */
-	private Map<Location, Map<ZonedDateTime, AppointmentBlock>> indexApptBlocks(List<Location> locations,
+	private Map<Location, Map<LocalDateTime, AppointmentBlock>> indexApptBlocks(List<Location> locations,
 	                                                                       List<AppointmentBlock> appointmentBlocks) {
-		Map<Location, Map<ZonedDateTime, AppointmentBlock>> map = new HashMap<Location, Map<ZonedDateTime, AppointmentBlock>>();
+		Map<Location, Map<LocalDateTime, AppointmentBlock>> map = new HashMap<Location, Map<LocalDateTime, AppointmentBlock>>();
 		for (Location location : locations) {
-			map.put(location, new HashMap<ZonedDateTime, AppointmentBlock>());
+			map.put(location, new HashMap<LocalDateTime, AppointmentBlock>());
 		}
 		for (AppointmentBlock appointmentBlock : appointmentBlocks) {
-			ZonedDateTime dateTime = ZonedDateTime.ofInstant(appointmentBlock.getStartDate().toInstant(),
+			LocalDateTime dateTime = LocalDateTime.ofInstant(appointmentBlock.getStartDate().toInstant(),
 																ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
 			map.get(appointmentBlock.getLocation()).put(dateTime, appointmentBlock);
 		}

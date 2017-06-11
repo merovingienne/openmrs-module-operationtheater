@@ -265,19 +265,19 @@
 
             <!-- joda time -->
             <!-- 2017.05.28 - Stop loadng joda, as it is already loaded in the core-->
-            <dependency>
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time</artifactId>
-                <version>${jodatimeVersion}</version>
-                <type>jar</type>
-                <!--<scope>provided</scope>-->
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>joda-time</groupId>-->
+                <!--<artifactId>joda-time</artifactId>-->
+                <!--<version>${jodatimeVersion}</version>-->
+                <!--<type>jar</type>-->
+                <!--&lt;!&ndash;<scope>provided</scope>&ndash;&gt;-->
+            <!--</dependency>-->
 
-            <dependency>
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time-hibernate</artifactId>
-                <version>${jodatimeHibernateVersion}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>joda-time</groupId>-->
+                <!--<artifactId>joda-time-hibernate</artifactId>-->
+                <!--<version>${jodatimeHibernateVersion}</version>-->
+            <!--</dependency>-->
 
             <!-- DBSetup (dbunit alternative) -->
             <dependency>

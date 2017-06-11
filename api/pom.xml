@@ -116,16 +116,16 @@
         <!-- End OpenMRS modules -->
 
         <!-- joda time -->
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>joda-time</groupId>-->
+            <!--<artifactId>joda-time</artifactId>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time-hibernate</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>joda-time</groupId>-->
+            <!--<artifactId>joda-time-hibernate</artifactId>-->
+        <!--</dependency>-->
 
 
         <dependency>
@@ -142,10 +142,10 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
-                <!--<exclusion>-->
-                    <!--<groupId>com.thoughtworks.xstream</groupId>-->
-                    <!--<artifactId>xstream</artifactId>-->
-                <!--</exclusion>-->
+                <exclusion>
+                    <groupId>com.thoughtworks.xstream</groupId>
+                    <artifactId>xstream</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>commons-io</groupId>
                     <artifactId>commons-io</artifactId>
@@ -172,6 +172,10 @@
                 <exclusion>
                     <groupId>org.antlr</groupId>
                     <artifactId>antlr-runtime</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.thoughtworks.xstream</groupId>
+                    <artifactId>xstream</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

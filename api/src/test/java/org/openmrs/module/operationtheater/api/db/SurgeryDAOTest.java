@@ -234,7 +234,7 @@ public class SurgeryDAOTest extends BaseModuleContextSensitiveTest {
 
 		//call function under test
 		List<Surgery> surgeryList = surgeryDAO.getScheduledSurgeries(
-				refDate.toLocalDate(), refDate.plusDays(1).toLocalDate());
+				refDate, refDate.plusDays(1));
 
 		//verify
 		assertThat(surgeryList, hasSize(1));
@@ -243,7 +243,7 @@ public class SurgeryDAOTest extends BaseModuleContextSensitiveTest {
 
 	/**
 	 * @verifies return all unvoided surgeries that are started before dateTime but are not finished
-	 * @see SurgeryDAO#getAllOngoingSurgeries(LocalDate)
+	 * @see SurgeryDAO#getAllOngoingSurgeries(LocalDateTime)
 	 */
 	@Test
 	public void getAllOngoingSurgeries_shouldReturnAllUnvoidedSurgeriesThatAreStartedBeforeDateTimeButAreNotFinished()
@@ -276,7 +276,7 @@ public class SurgeryDAOTest extends BaseModuleContextSensitiveTest {
 		dbSetupTracker.launchIfNecessary(dbSetup);
 
 		//call method under test
-		List<Surgery> surgeries = surgeryDAO.getAllOngoingSurgeries(LocalDate.from(refDate.plusHours(12)));
+		List<Surgery> surgeries = surgeryDAO.getAllOngoingSurgeries(refDate.plusHours(12));
 
 		//verify
 		assertThat(surgeries, hasSize(2));
@@ -286,7 +286,7 @@ public class SurgeryDAOTest extends BaseModuleContextSensitiveTest {
 
 	/**
 	 * @verifies return empty list if dateTime is null
-	 * @see SurgeryDAO#getAllOngoingSurgeries(LocalDate)
+	 * @see SurgeryDAO#getAllOngoingSurgeries(LocalDateTime)
 	 */
 	@Test
 	public void getAllOngoingSurgeries_shouldReturnEmptyListIfDateTimeIsNull() throws Exception {

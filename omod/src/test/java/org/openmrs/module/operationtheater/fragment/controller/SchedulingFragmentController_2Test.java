@@ -4,7 +4,7 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.operation.Operation;
 import org.databene.commons.db.DBUtil;
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,6 +33,13 @@ import org.openmrs.ui.framework.fragment.action.FragmentActionResult;
 import org.openmrs.ui.framework.fragment.action.SuccessResult;
 import org.springframework.validation.Validator;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+
 import static com.ninja_squad.dbsetup.Operations.sequenceOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
@@ -52,17 +59,17 @@ public class SchedulingFragmentController_2Test extends BaseModuleContextSensiti
 
 //	private static DbSetupTracker dbSetupTracker = new DbSetupTracker();
 
-	private DateTime refDate = new DateTime().withTimeAtStartOfDay();
+	private LocalDateTime refDate = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
 
-	private DateTime now;
+	private LocalDateTime now;
 
 	private Time timeMock;
 
 	@Before
 	public void setUp() {
 		timeMock =  Mockito.mock(Time.class);
-		now = refDate.withTime(11, 0, 0, 0);
-		when(timeMock.now()).thenReturn(now);
+		now = refDate.withHour(11);
+		when(timeMock.now()).thenReturn(now.atZone(ZoneId.systemDefault()));
 	}
 
 	@After
@@ -104,8 +111,11 @@ public class SchedulingFragmentController_2Test extends BaseModuleContextSensiti
 						.build(),
 				insertInto(Config.SURGERY)
 						.columns("patient_id", "procedure_id", "scheduling_data_id", "date_started", "date_finished")
-						.values(100, 1, 1, now.minusHours(1).toDate(), null)
-						.values(100, 1, 2, now.minusHours(2).toDate(), now.minusMinutes(1).toDate())
+						.values(100, 1, 1,
+								Date.from(now.minusHours(1).atZone(ZoneId.systemDefault()).toInstant()), null)
+						.values(100, 1, 2,
+								Date.from(now.minusHours(2).atZone(ZoneId.systemDefault()).toInstant()),
+								Date.from(now.minusMinutes(1).atZone(ZoneId.systemDefault()).toInstant()))
 						.values(100, 1, 3, null, null)
 						.build()
 		);
@@ -165,8 +175,10 @@ public class SchedulingFragmentController_2Test extends BaseModuleContextSensiti
 						.build(),
 				insertInto(Config.SURGERY)
 						.columns("patient_id", "procedure_id", "scheduling_data_id", "date_started", "date_finished")
-						.values(100, 1, 1, now.minusMinutes(10).toDate(), null)
-						.values(100, 2, 2, now.minusMinutes(10).toDate(), null)
+						.values(100, 1, 1,
+								Date.from(now.minusMinutes(10).atZone(ZoneId.systemDefault()).toInstant()), null)
+						.values(100, 2, 2,
+								Date.from(now.minusMinutes(10).atZone(ZoneId.systemDefault()).toInstant()), null)
 						.values(100, 1, 3, null, null)
 						.build()
 		);

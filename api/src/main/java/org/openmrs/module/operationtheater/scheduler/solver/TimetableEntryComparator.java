@@ -24,8 +24,8 @@ public class TimetableEntryComparator implements Comparator<TimetableEntry> {
 	public int compare(TimetableEntry left, TimetableEntry right) {
 		String leftLocationUuid = left.getLocation() != null ? left.getLocation().getUuid() : "aaaaa";
 		String rightLocationUuid = right.getLocation() != null ? right.getLocation().getUuid() : "aaaaa";
-		long leftMillis = left.getStart() != null ? left.getStart().getMillis() : Long.MAX_VALUE;
-		long rightMillis = right.getStart() != null ? right.getStart().getMillis() : Long.MAX_VALUE;
+		long leftMillis = left.getStart() != null ? left.getStart().toInstant().toEpochMilli() : Long.MAX_VALUE;
+		long rightMillis = right.getStart() != null ? right.getStart().toInstant().toEpochMilli() : Long.MAX_VALUE;
 
 		//ensure that a started plannedSurgery is always the first element for a location
 		int leftStarted = 0;

@@ -1,6 +1,6 @@
 package org.openmrs.module.operationtheater.fragment.controller;
 
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.api.ProviderService;
@@ -20,6 +20,8 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -205,21 +207,22 @@ public class SurgeryFragmentController {
 
 		//date created
 		if (surgery.getDateCreated() != null) {
-			String dateCreated = OTMetadata.DATE_TIME_FORMATTER.print(new DateTime(surgery.getDateCreated()));
+			String dateCreated = OTMetadata.DATE_TIME_FORMATTER.format(
+					LocalDateTime.ofInstant(surgery.getDateCreated().toInstant(), ZoneId.systemDefault()));
 			String displayName = ui.message("operationtheater.surgery.dateCreated.displayName");
 			surgeryTimes.add(new SurgeryTime(SurgeryTimeType.CREATED, displayName, dateCreated));
 		}
 
 		//date started
 		if (surgery.getDateStarted() != null) {
-			String dateStarted = OTMetadata.DATE_TIME_FORMATTER.print(surgery.getDateStarted());
+			String dateStarted = OTMetadata.DATE_TIME_FORMATTER.format(surgery.getDateStarted());
 			String displayName = ui.message("operationtheater.surgery.dateStarted.displayName");
 			surgeryTimes.add(new SurgeryTime(SurgeryTimeType.STARTED, displayName, dateStarted));
 		}
 
 		//date finished
 		if (surgery.getDateFinished() != null) {
-			String dateFinished = OTMetadata.DATE_TIME_FORMATTER.print(surgery.getDateFinished());
+			String dateFinished = OTMetadata.DATE_TIME_FORMATTER.format(surgery.getDateFinished());
 			String displayName = ui.message("operationtheater.surgery.dateFinished.displayName");
 			surgeryTimes.add(new SurgeryTime(SurgeryTimeType.FINISHED, displayName, dateFinished));
 		}
@@ -252,7 +255,7 @@ public class SurgeryFragmentController {
 			return new FailureResult(ui.message("operationtheater.surgery.alreadyStarted"));
 		}
 
-		surgery.setDateStarted(time.now());
+		surgery.setDateStarted(time.now().toLocalDateTime());
 
 		//validate
 		Errors errors = new BindException(surgery, "surgery");
@@ -286,7 +289,7 @@ public class SurgeryFragmentController {
 			return new FailureResult(ui.message("operationtheater.surgery.alreadyFinished"));
 		}
 
-		surgery.setDateFinished(time.now());
+		surgery.setDateFinished(time.now().toLocalDateTime());
 
 		//validate
 		Errors errors = new BindException(surgery, "surgery");

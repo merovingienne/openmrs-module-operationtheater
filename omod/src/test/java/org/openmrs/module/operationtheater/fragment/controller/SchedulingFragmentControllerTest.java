@@ -1,7 +1,7 @@
 package org.openmrs.module.operationtheater.fragment.controller;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
+//import org.joda.time.DateTime;
+//import org.joda.time.format.DateTimeFormat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -38,6 +38,10 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.springframework.validation.Validator;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -78,8 +82,8 @@ public class SchedulingFragmentControllerTest {
 		//FIXME refactor this test and use dbunit!! - turned out that BaseModuleContextSensitiveTest doesn't work with Powermockito
 
 		//prepare parameters
-		Date start = new DateTime(2014, 6, 9, 0, 0).toDate();
-		Date end = new DateTime(2014, 6, 9, 23, 59).toDate();
+		Date start = Date.from(LocalDateTime.of(2014, 6, 9, 0, 0).atZone(ZoneId.systemDefault()).toInstant());
+		Date end = Date.from(LocalDateTime.of(2014, 6, 9, 23, 59).atZone(ZoneId.systemDefault()).toInstant());
 		List<String> resources = new ArrayList<String>();
 		resources.add("ot 1");
 		resources.add("ot 2");
@@ -131,18 +135,18 @@ public class SchedulingFragmentControllerTest {
 		List<AppointmentBlock> blocks = new ArrayList<AppointmentBlock>();
 		AppointmentBlock blockOt2 = new AppointmentBlock();
 		blockOt2.setLocation(ot2);
-		DateTime blockStartDate = new DateTime(2014, 6, 9, 7, 35);
-		blockOt2.setStartDate(blockStartDate.toDate());
-		DateTime blockEndDate = new DateTime(2014, 6, 9, 20, 55);
-		blockOt2.setEndDate(blockEndDate.toDate());
+		LocalDateTime blockStartDate = LocalDateTime.of(2014, 6, 9, 7, 35);
+		blockOt2.setStartDate(Date.from(blockStartDate.atZone(ZoneId.systemDefault()).toInstant()));
+		LocalDateTime blockEndDate = LocalDateTime.of(2014, 6, 9, 20, 55);
+		blockOt2.setEndDate(Date.from(blockEndDate.atZone(ZoneId.systemDefault()).toInstant()));
 		blocks.add(blockOt2);
 
 		//ot3 is not available for this day
 		AppointmentBlock blockOt3 = new AppointmentBlock();
-		blockStartDate = blockStartDate.withTimeAtStartOfDay();
+		blockStartDate = blockStartDate.truncatedTo(ChronoUnit.DAYS);
 		blockOt3.setLocation(ot3);
-		blockOt3.setStartDate(blockStartDate.toDate());
-		blockOt3.setEndDate(blockStartDate.toDate());
+		blockOt3.setStartDate(Date.from(blockStartDate.atZone(ZoneId.systemDefault()).toInstant()));
+		blockOt3.setEndDate(Date.from(blockStartDate.atZone(ZoneId.systemDefault()).toInstant()));
 		blocks.add(blockOt3);
 
 		List<Surgery> surgeries = new ArrayList<Surgery>();
@@ -155,8 +159,8 @@ public class SchedulingFragmentControllerTest {
 		when(patient.getGivenName()).thenReturn("given name");
 		when(patient.getUuid()).thenReturn("patient_uuid");
 		String pattern = "yyyy-MM-dd HH:mm";
-		DateTime begin = DateTime.parse("2014-06-09 12:00", DateTimeFormat.forPattern(pattern));
-		DateTime finish = DateTime.parse("2014-06-09 13:30", DateTimeFormat.forPattern(pattern));
+		LocalDateTime begin = LocalDateTime.parse("2014-06-09 12:00", DateTimeFormatter.ofPattern(pattern));
+		LocalDateTime finish = LocalDateTime.parse("2014-06-09 13:30", DateTimeFormatter.ofPattern(pattern));
 
 		surgery.setProcedure(procedure);
 		surgery.setPatient(patient);
@@ -176,7 +180,9 @@ public class SchedulingFragmentControllerTest {
 		doReturn(tag).when(locationService).getLocationTagByUuid(OTMetadata.LOCATION_TAG_OPERATION_THEATER_UUID);
 		doReturn(locations).when(locationService).getLocationsByTag(tag);
 		doReturn(blocks).when(appointmentService).getAppointmentBlocks(start, end, "1,2,3,", null, null);
-		doReturn(surgeries).when(otService).getScheduledSurgeries(eq(new DateTime(start)), eq(new DateTime(end)));
+		doReturn(surgeries).when(otService).getScheduledSurgeries(
+				eq(LocalDateTime.ofInstant(start.toInstant(), ZoneId.systemDefault())),
+				eq(LocalDateTime.ofInstant(end.toInstant(), ZoneId.systemDefault())));
 
 		//call function under test
 		List<SimpleObject> result = new SchedulingFragmentController().getEvents(new TestUiUtils(),
@@ -216,8 +222,8 @@ public class SchedulingFragmentControllerTest {
 		Location location = new Location();
 		location.setUuid(uuid);
 
-		Date start = new DateTime(2014, 6, 9, 7, 12).toDate();
-		Date end = new DateTime(2014, 6, 9, 20, 55).toDate();
+		Date start = Date.from(LocalDateTime.of(2014, 6, 9, 7, 12).atZone(ZoneId.systemDefault()).toInstant());
+		Date end = Date.from(LocalDateTime.of(2014, 6, 9, 20, 55).atZone(ZoneId.systemDefault()).toInstant());
 
 		//mock service layer
 		LocationService locationService = Mockito.mock(LocationService.class);
@@ -257,8 +263,8 @@ public class SchedulingFragmentControllerTest {
 		block.setUuid("2");
 		blocks.add(block);
 
-		Date start = new DateTime(2014, 6, 9, 7, 12).toDate();
-		Date end = new DateTime(2014, 6, 9, 20, 55).toDate();
+		Date start = Date.from(LocalDateTime.of(2014, 6, 9, 7, 12).atZone(ZoneId.systemDefault()).toInstant());
+		Date end = Date.from(LocalDateTime.of(2014, 6, 9, 20, 55).atZone(ZoneId.systemDefault()).toInstant());
 
 		//mock service layer
 		LocationService locationService = Mockito.mock(LocationService.class);
@@ -325,8 +331,12 @@ public class SchedulingFragmentControllerTest {
 		assertThat(captured, is(surgery));
 		assertThat(captured.getSchedulingData(), is(schedulingData));
 		assertThat(captured.getSchedulingData().getLocation(), is(location));
-		assertThat(captured.getSchedulingData().getStart(), equalTo(new DateTime(scheduledDateTime)));
-		assertThat(captured.getSchedulingData().getEnd(), equalTo(new DateTime(scheduledDateTime).plusMinutes(12 + 34)));
+		assertThat(captured.getSchedulingData().getStart(),
+				equalTo(LocalDateTime.ofInstant(scheduledDateTime.toInstant(),
+						ZoneId.systemDefault())));
+		assertThat(captured.getSchedulingData().getEnd(),
+				equalTo(LocalDateTime.ofInstant(scheduledDateTime.toInstant(),
+						ZoneId.systemDefault()).plusMinutes(12 + 34)));
 		assertThat(captured.getSchedulingData().getDateLocked(), is(dateLocked));
 
 		assertThat(result, instanceOf(SuccessResult.class));

@@ -16,7 +16,6 @@ import org.openmrs.module.operationtheater.scheduler.solver.PlannedSurgeryDiffic
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;

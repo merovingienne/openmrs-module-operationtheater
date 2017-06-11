@@ -1,6 +1,6 @@
 package org.openmrs.module.operationtheater.fragment.controller;
 
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -24,11 +24,10 @@ import org.openmrs.ui.framework.fragment.action.FragmentActionResult;
 import org.openmrs.ui.framework.fragment.action.SuccessResult;
 import org.springframework.validation.Errors;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -362,13 +361,13 @@ public class SurgeryFragmentControllerTest {
 	 */
 	@Test
 	public void getSurgeryTimes_shouldReturnAllSurgeryTimesOfThisSurgeryIfItHasAlreadyBeenFinished() throws Exception {
-		DateTime refDate = new DateTime(2014, 8, 10, 17, 0, 0);
-		DateTime created = refDate.minusDays(1);
-		DateTime started = refDate;
-		DateTime finished = refDate.plusHours(1);
+		LocalDateTime refDate = LocalDateTime.of(2014, 8, 10, 17, 0, 0);
+		LocalDateTime created = refDate.minusDays(1);
+		LocalDateTime started = refDate;
+		LocalDateTime finished = refDate.plusHours(1);
 
 		Surgery surgery = new Surgery();
-		surgery.setDateCreated(created.toDate());
+		surgery.setDateCreated(Date.from(created.atZone(ZoneId.systemDefault()).toInstant()));
 		surgery.setDateStarted(started);
 		surgery.setDateFinished(finished);
 
@@ -397,12 +396,12 @@ public class SurgeryFragmentControllerTest {
 	 */
 	@Test
 	public void getSurgeryTimes_shouldReturnCreatedAndStartTimesOfThisSurgeryIfItHasntBeenFinished() throws Exception {
-		DateTime refDate = new DateTime(2014, 8, 10, 17, 0, 0);
-		DateTime created = refDate.minusDays(1);
-		DateTime started = refDate;
+		LocalDateTime refDate = LocalDateTime.of(2014, 8, 10, 17, 0, 0);
+		LocalDateTime created = refDate.minusDays(1);
+		LocalDateTime started = refDate;
 
 		Surgery surgery = new Surgery();
-		surgery.setDateCreated(created.toDate());
+		surgery.setDateCreated(Date.from(created.atZone(ZoneId.systemDefault()).toInstant()));
 		surgery.setDateStarted(started);
 
 		//call method under test
@@ -426,11 +425,11 @@ public class SurgeryFragmentControllerTest {
 	 */
 	@Test
 	public void getSurgeryTimes_shouldReturnCreatedTimeOfThisSurgeryIfItHasntBeenStarted() throws Exception {
-		DateTime refDate = new DateTime(2014, 8, 10, 17, 0, 0);
-		DateTime created = refDate.minusDays(1);
+		LocalDateTime refDate = LocalDateTime.of(2014, 8, 10, 17, 0, 0);
+		LocalDateTime created = refDate.minusDays(1);
 
 		Surgery surgery = new Surgery();
-		surgery.setDateCreated(created.toDate());
+		surgery.setDateCreated(Date.from(created.atZone(ZoneId.systemDefault()).toInstant()));
 
 		//call method under test
 		List<SimpleObject> result = new SurgeryFragmentController().getSurgeryTimes(new TestUiUtils(), surgery);
@@ -487,8 +486,8 @@ public class SurgeryFragmentControllerTest {
 	@Test
 	public void startSurgery_shouldReturnFailureResultIfSurgeryHasAlreadyBeenFinished() throws Exception {
 		Surgery surgery = new Surgery();
-		surgery.setDateStarted(new DateTime().minusMinutes(2));
-		surgery.setDateFinished(new DateTime().minusMinutes(1));
+		surgery.setDateStarted(LocalDateTime.now().minusMinutes(2));
+		surgery.setDateFinished(LocalDateTime.now().minusMinutes(1));
 
 		//call method under test
 		FragmentActionResult result = new SurgeryFragmentController().startSurgery(new TestUiUtils(), surgery, null, null);
@@ -505,7 +504,7 @@ public class SurgeryFragmentControllerTest {
 	@Test
 	public void startSurgery_shouldReturnFailureResultIfSurgeryHasAlreadyBeenStarted() throws Exception {
 		Surgery surgery = new Surgery();
-		surgery.setDateStarted(new DateTime().minusMinutes(1));
+		surgery.setDateStarted(LocalDateTime.now().minusMinutes(1));
 
 		//call method under test
 		FragmentActionResult result = new SurgeryFragmentController().startSurgery(new TestUiUtils(), surgery, null, null);
@@ -542,7 +541,8 @@ public class SurgeryFragmentControllerTest {
 
 		//verify
 		verify(validator).validate(Mockito.eq(surgery), Mockito.any(Errors.class));
-		assertThat(captor.getValue().getDateStarted().withMillisOfSecond(0), is(new DateTime().withMillisOfSecond(0)));
+		assertThat(captor.getValue().getDateStarted().truncatedTo(ChronoUnit.SECONDS),
+				is(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)));
 		assertThat(result, instanceOf(SuccessResult.class));
 		assertThat(((SuccessResult) result).getMessage(), is("operationtheater.surgery.started:locationName"));
 	}
@@ -591,7 +591,7 @@ public class SurgeryFragmentControllerTest {
 	@Test
 	public void finishSurgery_shouldReturnFailureResultIfSurgeryHasAlreadyBeenFinished() throws Exception {
 		Surgery surgery = new Surgery();
-		surgery.setDateFinished(new DateTime().minusMinutes(1));
+		surgery.setDateFinished(LocalDateTime.now().minusMinutes(1));
 
 		//call method under test
 		FragmentActionResult result = new SurgeryFragmentController().finishSurgery(new TestUiUtils(), surgery, null, null);
@@ -628,7 +628,8 @@ public class SurgeryFragmentControllerTest {
 
 		//verify
 		verify(validator).validate(Mockito.eq(surgery), Mockito.any(Errors.class));
-		assertThat(captor.getValue().getDateFinished().withMillisOfSecond(0), is(new DateTime().withMillisOfSecond(0)));
+		assertThat(captor.getValue().getDateFinished().truncatedTo(ChronoUnit.SECONDS),
+				is(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)));
 		assertThat(result, instanceOf(SuccessResult.class));
 		assertThat(((SuccessResult) result).getMessage(), is("operationtheater.surgery.finished"));
 	}
