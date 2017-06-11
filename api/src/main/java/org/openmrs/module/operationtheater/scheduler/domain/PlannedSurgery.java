@@ -2,10 +2,10 @@ package org.openmrs.module.operationtheater.scheduler.domain;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+//import org.joda.time.DateTime;
+//import org.joda.time.Interval;
+//import org.joda.time.format.DateTimeFormat;
+//import org.joda.time.format.DateTimeFormatter;
 import org.openmrs.Location;
 import org.openmrs.module.operationtheater.Procedure;
 import org.openmrs.module.operationtheater.SchedulingData;
@@ -15,6 +15,13 @@ import org.openmrs.module.operationtheater.scheduler.solver.MovablePlannedSurger
 import org.openmrs.module.operationtheater.scheduler.solver.PlannedSurgeryDifficultyComparator;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+import org.threeten.extra.Interval;
 
 /**
  * This class is the Planning entity of this optimization problem
@@ -36,9 +43,9 @@ public class PlannedSurgery implements TimetableEntry {
 
 	//shadow variable - automatically calculated if the underlying genuine planning variable (start) changes its value
 	//not changed by the solver
-	private DateTime start;
+	private ZonedDateTime start;
 
-	private DateTime end;
+	private ZonedDateTime end;
 
 	private Location location;
 
@@ -63,7 +70,8 @@ public class PlannedSurgery implements TimetableEntry {
 		}
 
 		//if Interval is constructed with a null parameter it assumes a current timestamp
-		return new Interval(this.start, this.end).overlaps(new Interval(other.start, other.end));
+		return Interval.of(this.start.toInstant(), this.end.toInstant())
+				.overlaps(Interval.of(other.start.toInstant(), other.end.toInstant()));
 	}
 
 	/**
@@ -78,9 +86,9 @@ public class PlannedSurgery implements TimetableEntry {
 			return true;
 		}
 
-		Interval available = otService.getLocationAvailableTime(location, start);
-		Interval scheduled = new Interval(start, end);
-		Interval overlap = scheduled.overlap(available);
+		Interval available = otService.getLocationAvailableTime(location, start.toLocalDate());
+		Interval scheduled = Interval.of(start.toInstant(), end.toInstant());
+		Interval overlap = scheduled.intersection(available);
 		return !scheduled.equals(overlap);
 	}
 
@@ -115,7 +123,7 @@ public class PlannedSurgery implements TimetableEntry {
 		//if surgery has already been started correct surgery end time, because otPreparation has already been performed
 		if (surgery.getDateStarted() != null) {
 			int interventionDuration = surgery.getProcedure().getInterventionDuration();
-			end = surgery.getDateStarted().plusMinutes(interventionDuration);
+			end = ZonedDateTime.from(surgery.getDateStarted().atStartOfDay(ZoneId.systemDefault())).plusMinutes(interventionDuration);
 		}
 		location = previousTimetableEntry.getLocation();
 	}
@@ -138,7 +146,7 @@ public class PlannedSurgery implements TimetableEntry {
 		this.location = location;
 	}
 
-	public DateTime getStart() {
+	public ZonedDateTime getStart() {
 		return start;
 	}
 
@@ -146,7 +154,7 @@ public class PlannedSurgery implements TimetableEntry {
 	 * @param start
 	 * @should set start and update end accordingly
 	 */
-	public void setStart(DateTime start) {
+	public void setStart(ZonedDateTime start) {
 		setStart(start, true);
 	}
 
@@ -156,7 +164,7 @@ public class PlannedSurgery implements TimetableEntry {
 	 * @param start
 	 * @param calculateEndTime
 	 */
-	public void setStart(DateTime start, boolean calculateEndTime) {
+	public void setStart(ZonedDateTime start, boolean calculateEndTime) {
 		this.start = start;
 		if (calculateEndTime) {
 			if (start == null) {
@@ -164,17 +172,17 @@ public class PlannedSurgery implements TimetableEntry {
 			} else {
 				int interventionDuration = surgery.getProcedure().getInterventionDuration();
 				int otPreparationDuration = surgery.getProcedure().getOtPreparationDuration();
-				DateTime endDate = start.plusMinutes(interventionDuration + otPreparationDuration);
+				ZonedDateTime endDate = start.plusMinutes(interventionDuration + otPreparationDuration);
 				setEnd(endDate);
 			}
 		}
 	}
 
-	public DateTime getEnd() {
+	public ZonedDateTime getEnd() {
 		return end;
 	}
 
-	public void setEnd(DateTime end) {
+	public void setEnd(ZonedDateTime end) {
 		this.end = end;
 	}
 
@@ -192,9 +200,9 @@ public class PlannedSurgery implements TimetableEntry {
 
 	@Override
 	public String toString() {
-		DateTimeFormatter fmt = DateTimeFormat.forPattern("dd.MM HH:mm");
-		String startStr = start == null ? "null      " : fmt.print(start);
-		String endStr = end == null ? "null      " : fmt.print(end);
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd.MM HH:mm");
+		String startStr = start == null ? "null      " : fmt.format(start);
+		String endStr = end == null ? "null      " : fmt.format(end);
 		return "\n         PS {" +
 				"surgery=" + surgery.getUuid() +
 				"} -> " + previousTimetableEntry;
@@ -246,8 +254,8 @@ public class PlannedSurgery implements TimetableEntry {
 			surgery.setSchedulingData(scheduling);
 		}
 		if (location != null) {
-			scheduling.setStart(start);
-			scheduling.setEnd(end);
+			scheduling.setStart(start.toLocalDateTime());
+			scheduling.setEnd(end.toLocalDateTime());
 			scheduling.setLocation(location);
 
 		} else {

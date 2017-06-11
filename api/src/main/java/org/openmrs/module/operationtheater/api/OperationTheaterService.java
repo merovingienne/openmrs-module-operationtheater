@@ -28,6 +28,7 @@ import org.openmrs.module.operationtheater.api.db.SurgeryDAO;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.threeten.extra.Interval;
@@ -207,7 +208,7 @@ public interface OperationTheaterService extends OpenmrsService {
 	 * @should call surgeryDAO getScheduledSurgeries if parameter are not null
 	 * @should return empty list if a parameter is null
 	 */
-	public List<Surgery> getScheduledSurgeries(LocalDate from, LocalDate to);
+	public List<Surgery> getScheduledSurgeries(LocalDateTime from, LocalDateTime to);
 
 	/**
 	 * returns all unvoided surgeries that have been started, but have not been finished yet
@@ -217,7 +218,7 @@ public interface OperationTheaterService extends OpenmrsService {
 	 * @should call surgeryDAO getAllOngoingSurgeries if parameter are not null
 	 * @should return empty list if dateTime is null
 	 */
-	public List<Surgery> getAllOngoingSurgeries(LocalDate dateTime);
+	public List<Surgery> getAllOngoingSurgeries(LocalDateTime dateTime);
 
 	/**
 	 * get available times for the given date and location

@@ -5,6 +5,7 @@ import org.openmrs.Patient;
 import org.openmrs.module.operationtheater.Surgery;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public interface SurgeryDAO extends GenericDAO<Surgery> {
 	 * @return
 	 * @should return all unvoided surgeries that are scheduled between from and to date
 	 */
-	public List<Surgery> getScheduledSurgeries(LocalDate from, LocalDate to);
+	public List<Surgery> getScheduledSurgeries(LocalDateTime from, LocalDateTime to);
 
 	/**
 	 * returns all unvoided surgeries that have been started, but have not been finished yet
@@ -47,5 +48,5 @@ public interface SurgeryDAO extends GenericDAO<Surgery> {
 	 * @should return all unvoided surgeries that are started before dateTime but are not finished
 	 * @should return empty list if dateTime is null
 	 */
-	public List<Surgery> getAllOngoingSurgeries(LocalDate dateTime);
+	public List<Surgery> getAllOngoingSurgeries(LocalDateTime dateTime);
 }

@@ -8,7 +8,7 @@ import org.drools.core.RuleBase;
 import org.drools.core.RuleBaseFactory;
 import org.drools.core.StatefulSession;
 import org.drools.core.base.RuleNameEqualsAgendaFilter;
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,8 +26,9 @@ import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -78,11 +79,11 @@ public class DrlRuleTest {
 		ps1.setLocation(location);
 		ps2.setLocation(location);
 
-		LocalDateTime start1 = LocalDateTime.now();
-		LocalDateTime start2 = start1.plusHours(1);
+		ZonedDateTime start1 = ZonedDateTime.now();
+		ZonedDateTime start2 = start1.plusHours(1);
 
-		LocalDateTime end1 = start1.plusHours(2);
-		LocalDateTime end2 = end1.plusHours(1);
+		ZonedDateTime end1 = start1.plusHours(2);
+		ZonedDateTime end2 = end1.plusHours(1);
 
 		ps1.setStart(start1, false);
 		ps2.setStart(start2, false);
@@ -108,13 +109,13 @@ public class DrlRuleTest {
 	@Test
 	public void testRule_firstComeFirstServed() {
 
-		DateTime now = new DateTime();
+		ZonedDateTime now = ZonedDateTime.now();
 		int waitingTime = 54;
-		DateTime surgeryCreated = now.minusHours(waitingTime);
+		ZonedDateTime surgeryCreated = now.minusHours(waitingTime);
 
 		PlannedSurgery plannedSurgery = new PlannedSurgery();
 		Surgery surgery = new Surgery();
-		surgery.setDateCreated(surgeryCreated.toDate());
+		surgery.setDateCreated(Date.from(surgeryCreated.toInstant()));
 		plannedSurgery.setSurgery(surgery);
 		plannedSurgery.setStart(now, false);
 		plannedSurgery.setLocation(new Location());
@@ -158,7 +159,7 @@ public class DrlRuleTest {
 	@Test
 	public void testRule_conflictingAndOverlappingPlannedSurgeries() {
 		OperationTheaterService otService = Mockito.mock(OperationTheaterService.class);
-		when(otService.getLocationAvailableTime(any(Location.class), any(DateTime.class))).thenReturn(null);
+		when(otService.getLocationAvailableTime(any(Location.class), any(LocalDate.class))).thenReturn(null);
 
 		PlannedSurgery ps1 = new PlannedSurgery();
 		PlannedSurgery ps2 = new PlannedSurgery();
@@ -169,10 +170,10 @@ public class DrlRuleTest {
 		ps1.setSurgery(surgery1);
 		ps2.setSurgery(surgery2);
 
-		ps1.setStart(new DateTime(), false);
-		ps2.setStart(new DateTime(), false);
-		ps1.setEnd(new DateTime().plusHours(1));
-		ps2.setEnd(new DateTime().plusHours(1));
+		ps1.setStart(ZonedDateTime.now(), false);
+		ps2.setStart(ZonedDateTime.now(), false);
+		ps1.setEnd(ZonedDateTime.now().plusHours(1));
+		ps2.setEnd(ZonedDateTime.now().plusHours(1));
 
 		Location location = new Location();
 		ps1.setLocation(location);
@@ -202,7 +203,7 @@ public class DrlRuleTest {
 	@Test
 	public void testRule_conflictingButNotOverlappingPlannedSurgeries() {
 		OperationTheaterService otService = Mockito.mock(OperationTheaterService.class);
-		when(otService.getLocationAvailableTime(any(Location.class), any(DateTime.class))).thenReturn(null);
+		when(otService.getLocationAvailableTime(any(Location.class), any(LocalDate.class))).thenReturn(null);
 
 		PlannedSurgery ps1 = new PlannedSurgery();
 		PlannedSurgery ps2 = new PlannedSurgery();
@@ -213,8 +214,8 @@ public class DrlRuleTest {
 		ps1.setSurgery(surgery1);
 		ps2.setSurgery(surgery2);
 
-		ps1.setStart(new DateTime(), false);
-		ps1.setEnd(new DateTime().plusHours(1));
+		ps1.setStart(ZonedDateTime.now(), false);
+		ps1.setEnd(ZonedDateTime.now().plusHours(1));
 		ps2.setStart(ps1.getEnd(), false);
 		ps2.setEnd(ps1.getStart().plusHours(1));
 

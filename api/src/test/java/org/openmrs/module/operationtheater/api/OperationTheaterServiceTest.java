@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.mockito.cglib.core.Local;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
@@ -45,6 +44,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -470,13 +470,13 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 
 	/**
 	 * @verifies call surgeryDAO getScheduledSurgeries if parameter are not null
-	 * @see OperationTheaterService#getScheduledSurgeries(LocalDate, LocalDate)
+	 * @see OperationTheaterService#getScheduledSurgeries(LocalDateTime, LocalDateTime)
 	 */
 	@Test
 	public void getScheduledSurgeries_shouldCallSurgeryDAOGetScheduledSurgeriesIfParameterAreNotNull() throws Exception {
 
-		LocalDate from = LocalDate.now();
-		LocalDate to = from.plusDays(1);
+		LocalDateTime from = LocalDateTime.now();
+		LocalDateTime to = from.plusDays(1);
 
 		//call function under test
 		service.getScheduledSurgeries(from, to);
@@ -487,32 +487,32 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 
 	/**
 	 * @verifies return empty list if a parameter is null
-	 * @see OperationTheaterService#getScheduledSurgeries(LocalDate, LocalDate)
+	 * @see OperationTheaterService#getScheduledSurgeries(LocalDateTime, LocalDateTime)
 	 */
 	@Test
 	public void getScheduledSurgeries_shouldReturnEmptyListIfAParameterIsNull() throws Exception {
 		//call function under test
-		List<Surgery> result = service.getScheduledSurgeries(null, LocalDate.now());
+		List<Surgery> result = service.getScheduledSurgeries(null, LocalDateTime.now());
 
 		//verify
 		assertThat(result, hasSize(0));
-		verify(surgeryDAO, never()).getScheduledSurgeries(any(LocalDate.class), any(LocalDate.class));
+		verify(surgeryDAO, never()).getScheduledSurgeries(any(LocalDateTime.class), any(LocalDateTime.class));
 
 		//call function under test
-		result = service.getScheduledSurgeries(LocalDate.now(), null);
+		result = service.getScheduledSurgeries(LocalDateTime.now(), null);
 
 		//verify
 		assertThat(result, hasSize(0));
-		verify(surgeryDAO, never()).getScheduledSurgeries(any(LocalDate.class), any(LocalDate.class));
+		verify(surgeryDAO, never()).getScheduledSurgeries(any(LocalDateTime.class), any(LocalDateTime.class));
 	}
 
 	/**
 	 * @verifies call surgeryDAO getAllOngoingSurgeries if parameter are not null
-	 * @see OperationTheaterService#getAllOngoingSurgeries(LocalDate)
+	 * @see OperationTheaterService#getAllOngoingSurgeries(LocalDateTime)
 	 */
 	@Test
 	public void getAllOngoingSurgeries_shouldCallSurgeryDAOGetAllOngoingSurgeriesIfParameterAreNotNull() throws Exception {
-		LocalDate dateTime = LocalDate.now();
+		LocalDateTime dateTime = LocalDateTime.now();
 		List<Surgery> expected = new ArrayList<Surgery>();
 		when(surgeryDAO.getAllOngoingSurgeries(dateTime)).thenReturn(expected);
 
@@ -525,7 +525,7 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 
 	/**
 	 * @verifies return empty list if dateTime is null
-	 * @see OperationTheaterService#getAllOngoingSurgeries(LocalDate)
+	 * @see OperationTheaterService#getAllOngoingSurgeries(LocalDateTime)
 	 */
 	@Test
 	public void getAllOngoingSurgeries_shouldReturnEmptyListIfDateTimeIsNull() throws Exception {
@@ -534,6 +534,6 @@ public class OperationTheaterServiceTest { //extends BaseModuleContextSensitiveT
 
 		//verify
 		assertThat(result, hasSize(0));
-		verify(surgeryDAO, never()).getAllOngoingSurgeries(any(LocalDate.class));
+		verify(surgeryDAO, never()).getAllOngoingSurgeries(any(LocalDateTime.class));
 	}
 }

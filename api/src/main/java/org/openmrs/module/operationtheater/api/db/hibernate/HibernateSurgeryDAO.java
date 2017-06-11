@@ -25,7 +25,7 @@ import org.openmrs.module.operationtheater.api.db.SurgeryDAO;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -65,7 +65,7 @@ public class HibernateSurgeryDAO extends HibernateGenericDAO<Surgery> implements
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Surgery> getScheduledSurgeries(LocalDate from, LocalDate to) {
+	public List<Surgery> getScheduledSurgeries(LocalDateTime from, LocalDateTime to) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Surgery.class);
 		criteria.add(Restrictions.eq("voided", false));
 
@@ -85,7 +85,7 @@ public class HibernateSurgeryDAO extends HibernateGenericDAO<Surgery> implements
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Surgery> getAllOngoingSurgeries(LocalDate dateTime) {
+	public List<Surgery> getAllOngoingSurgeries(LocalDateTime dateTime) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Surgery.class);
 
 		criteria.add(Restrictions.eq("voided", false));

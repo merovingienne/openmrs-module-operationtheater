@@ -150,7 +150,7 @@ public class OperationTheaterServiceImpl extends BaseOpenmrsService implements O
 	}
 
 	@Override
-	public List<Surgery> getScheduledSurgeries(LocalDate from, LocalDate to) {
+	public List<Surgery> getScheduledSurgeries(LocalDateTime from, LocalDateTime to) {
 		if (from == null || to == null) {
 			return new ArrayList<Surgery>();
 		}
@@ -158,7 +158,7 @@ public class OperationTheaterServiceImpl extends BaseOpenmrsService implements O
 	}
 
 	@Override
-	public List<Surgery> getAllOngoingSurgeries(LocalDate dateTime) {
+	public List<Surgery> getAllOngoingSurgeries(LocalDateTime dateTime) {
 		if (dateTime == null) {
 			return new ArrayList<Surgery>();
 		}
