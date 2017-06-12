@@ -1,7 +1,9 @@
 package org.openmrs.module.operationtheater;
 
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+//import org.joda.time.format.DateTimeFormat;
+//import org.joda.time.format.DateTimeFormatter;
+
+import java.time.format.DateTimeFormatter;
 
 public class OTMetadata {
 
@@ -11,9 +13,9 @@ public class OTMetadata {
 
 	public static final String CALENDAR_COLOR_UUID = "aefe79d0-aa24-4216-ad00-41ba073f7a39";
 
-	public static final DateTimeFormatter AVAILABLE_TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm");
+	public static final DateTimeFormatter AVAILABLE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
-	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("d MMMM YYYY hh:mm a");
+	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("d MMMM YYYY hh:mm a");
 
 	public static final String LOCATION_TAG_OPERATION_THEATER_UUID = "af3e9ed5-2de2-4a10-9956-9cb2ad5f84f2";
 

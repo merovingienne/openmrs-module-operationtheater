@@ -1,12 +1,13 @@
 package org.openmrs.module.operationtheater.scheduler.solver;
 
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.junit.Test;
 import org.openmrs.Location;
 import org.openmrs.module.operationtheater.SchedulingData;
 import org.openmrs.module.operationtheater.Surgery;
 import org.openmrs.module.operationtheater.scheduler.domain.PlannedSurgery;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +20,7 @@ import static org.hamcrest.Matchers.is;
  */
 public class TimetableEntryComparatorTest {
 
-	private DateTime refDate = new DateTime().withTime(10, 0, 0, 0);
+	private ZonedDateTime refDate = ZonedDateTime.now().withHour(10);
 
 	/**
 	 * @verifies sorting PlannedSurgeries based on this Comparator should sort by location asc isStarted desc and start time asc
@@ -51,14 +52,14 @@ public class TimetableEntryComparatorTest {
 
 	}
 
-	private PlannedSurgery createPlainPlannedSurgery(String locationUuid, boolean isStarted, DateTime scheduledStartTime) {
+	private PlannedSurgery createPlainPlannedSurgery(String locationUuid, boolean isStarted, ZonedDateTime scheduledStartTime) {
 		PlannedSurgery plannedSurgery = new PlannedSurgery();
 		SchedulingData schedulingData = new SchedulingData();
-		schedulingData.setStart(scheduledStartTime);
+		schedulingData.setStart(scheduledStartTime.toLocalDateTime());
 		Surgery surgery = new Surgery();
 		surgery.setSchedulingData(schedulingData);
 		if (isStarted) {
-			surgery.setDateStarted(refDate);
+			surgery.setDateStarted(refDate.toLocalDateTime());
 		}
 		plannedSurgery.setSurgery(surgery);
 		Location location = new Location();

@@ -13,8 +13,8 @@
  */
 package org.openmrs.module.operationtheater.api;
 
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
+//import org.joda.time.DateTime;
+//import org.joda.time.Interval;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.api.APIException;
@@ -27,7 +27,11 @@ import org.openmrs.module.operationtheater.api.db.ProcedureDAO;
 import org.openmrs.module.operationtheater.api.db.SurgeryDAO;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import org.threeten.extra.Interval;
 
 /**
  * This service exposes module's core functionality. It is a Spring managed bean which is configured in moduleApplicationContext.xml.
@@ -204,7 +208,7 @@ public interface OperationTheaterService extends OpenmrsService {
 	 * @should call surgeryDAO getScheduledSurgeries if parameter are not null
 	 * @should return empty list if a parameter is null
 	 */
-	public List<Surgery> getScheduledSurgeries(DateTime from, DateTime to);
+	public List<Surgery> getScheduledSurgeries(LocalDateTime from, LocalDateTime to);
 
 	/**
 	 * returns all unvoided surgeries that have been started, but have not been finished yet
@@ -214,7 +218,7 @@ public interface OperationTheaterService extends OpenmrsService {
 	 * @should call surgeryDAO getAllOngoingSurgeries if parameter are not null
 	 * @should return empty list if dateTime is null
 	 */
-	public List<Surgery> getAllOngoingSurgeries(DateTime dateTime);
+	public List<Surgery> getAllOngoingSurgeries(LocalDateTime dateTime);
 
 	/**
 	 * get available times for the given date and location
@@ -229,5 +233,5 @@ public interface OperationTheaterService extends OpenmrsService {
 	 * @should throw APIException if availableStart attribute is not defined
 	 * @should throw APIException if availableEnd attribute is not defined
 	 */
-	public Interval getLocationAvailableTime(Location location, DateTime date);
+	public Interval getLocationAvailableTime(Location location, LocalDate date);
 }

@@ -4,7 +4,7 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +26,9 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.optaplanner.core.api.solver.SolverFactory;
 import org.optaplanner.core.config.solver.EnvironmentMode;
 
+import java.sql.Date;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static com.ninja_squad.dbsetup.Operations.sequenceOf;
@@ -46,16 +49,16 @@ public class SchedulerTest extends BaseModuleContextSensitiveTest {
 
 	private static DbSetupTracker dbSetupTracker = new DbSetupTracker();
 
-	private DateTime refDate = new DateTime().withTimeAtStartOfDay();
+	private ZonedDateTime refDate = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS);
 
-	private DateTime now;
+	private ZonedDateTime now;
 
 	@Before
 	public void setUp() {
 		DaemonTokenUtil.passDaemonTokenToModule();
 
 		Time timeMock = Mockito.mock(Time.class);
-		now = refDate.withTime(11, 0, 0, 0);
+		now = refDate.withHour(11);
 		when(timeMock.now()).thenReturn(now);
 		Whitebox.setInternalState(Scheduler.INSTANCE, "time", timeMock);
 	}
@@ -75,20 +78,33 @@ public class SchedulerTest extends BaseModuleContextSensitiveTest {
 						.build(),
 				insertInto(Config.SCHEDULING_DATA)
 						.columns("start", "end", "location_id", "date_locked")
-						.values(refDate.plusHours(36).toDate(), refDate.plusHours(36).plusMinutes(35 + 25).toDate(), 100,
+						.values(
+								Date.from(refDate.plusHours(36).toInstant()),
+								Date.from(refDate.plusHours(36).plusMinutes(35 + 25).toInstant()),
+								100,
 								false)
-						.values(refDate.plusHours(36).toDate(), refDate.plusHours(36).plusMinutes(35 + 25).toDate(), 100,
+						.values(
+								Date.from(refDate.plusHours(36).toInstant()),
+								Date.from(refDate.plusHours(36).plusMinutes(35 + 25).toInstant()),
+								100,
 								false)
-						.values(refDate.plusHours(60).toDate(), refDate.plusHours(60).plusMinutes(35 + 25).toDate(), 100,
+						.values(
+								Date.from(refDate.plusHours(60).toInstant()),
+								Date.from(refDate.plusHours(60).plusMinutes(35 + 25).toInstant()),
+								100,
 								true)
-						.values(refDate.plusDays(200).toDate(), refDate.plusDays(200).plusHours(1).toDate(), 100, true)
+						.values(
+								Date.from(refDate.plusDays(200).toInstant()),
+								Date.from(refDate.plusDays(200).plusHours(1).toInstant()),
+								100,
+								true)
 						.build(),
 				insertInto(Config.SURGERY, "date_created")
 						.columns("patient_id", "procedure_id", "scheduling_data_id", "date_created")
-						.values(100, 1, 1, refDate.minusWeeks(1).toDate())
-						.values(100, 1, 2, refDate.minusWeeks(2).toDate())
-						.values(100, 1, 3, refDate.minusWeeks(3).toDate()) //locked
-						.values(100, 1, 4, refDate.minusWeeks(3).toDate()) //outside planning period
+						.values(100, 1, 1, Date.from(refDate.minusWeeks(1).toInstant()))
+						.values(100, 1, 2, Date.from(refDate.minusWeeks(2).toInstant()))
+						.values(100, 1, 3, Date.from(refDate.minusWeeks(3).toInstant())) //locked
+						.values(100, 1, 4, Date.from(refDate.minusWeeks(3).toInstant())) //outside planning period
 						.build()
 		);
 		DbSetup dbSetup = DbUtil.buildDBSetup(operation, getConnection(), useInMemoryDatabase());
@@ -104,15 +120,21 @@ public class SchedulerTest extends BaseModuleContextSensitiveTest {
 						.build(),
 				insertInto(Config.SCHEDULING_DATA)
 						.columns("start", "end", "location_id", "date_locked")
-						.values(refDate.plusHours(12).toDate(),
-								refDate.plusHours(13).plusMinutes(35 + 25).toDate(), 100, false)
-						.values(refDate.plusHours(13).toDate(),
-								refDate.plusHours(14).plusMinutes(35 + 25).toDate(), 100, false)
+						.values(
+								Date.from(refDate.plusHours(12).toInstant()),
+								Date.from(refDate.plusHours(13).plusMinutes(35 + 25).toInstant()),
+								100,
+								false)
+						.values(
+								Date.from(refDate.plusHours(13).toInstant()),
+								Date.from(refDate.plusHours(14).plusMinutes(35 + 25).toInstant()),
+								100,
+								false)
 						.build(),
 				insertInto(Config.SURGERY, "date_created")
 						.columns("patient_id", "procedure_id", "scheduling_data_id", "date_created")
-						.values(100, 1, 1, refDate.minusWeeks(1).toDate())
-						.values(100, 1, 2, refDate.minusWeeks(2).toDate())
+						.values(100, 1, 1, Date.from(refDate.minusWeeks(1).toInstant()))
+						.values(100, 1, 2, Date.from(refDate.minusWeeks(2).toInstant()))
 						.build(),
 				Operations.insertInto("surgical_team")
 						.columns("surgery_id", "provider_id")
@@ -133,15 +155,24 @@ public class SchedulerTest extends BaseModuleContextSensitiveTest {
 						.build(),
 				insertInto(Config.SCHEDULING_DATA)
 						.columns("start", "end", "location_id", "date_locked")
-						.values(now.toDate(), now.plusMinutes(35 + 25).toDate(), 100, false)
-						.values(refDate.plusHours(13).toDate(),
-								refDate.plusHours(14).plusMinutes(35 + 25).toDate(), 100, false)
+						.values(
+								Date.from(now.toInstant()), Date.from(now.plusMinutes(35 + 25).toInstant()),
+								100,
+								false)
+						.values(
+								Date.from(refDate.plusHours(13).toInstant()),
+								Date.from(refDate.plusHours(14).plusMinutes(35 + 25).toInstant()),
+								100,
+								false)
 						.build(),
 				insertInto(Config.SURGERY, "date_created")
 						.columns("patient_id", "procedure_id", "scheduling_data_id", "date_created", "date_started")
 								//surgery started with 15min delay
-						.values(100, 1, 1, refDate.minusWeeks(1).toDate(), now.minusMinutes(15).toDate())
-						.values(100, 1, 2, refDate.minusWeeks(2).toDate(), null)
+						.values(100, 1, 1,
+								Date.from(refDate.minusWeeks(1).toInstant()),
+								Date.from(now.minusMinutes(15).toInstant()))
+						.values(100, 1, 2,
+								Date.from(refDate.minusWeeks(2).toInstant()), null)
 						.build()
 		);
 		DbSetup dbSetup = DbUtil.buildDBSetup(operation, getConnection(), useInMemoryDatabase());
@@ -179,15 +210,15 @@ public class SchedulerTest extends BaseModuleContextSensitiveTest {
 		List<Surgery> surgeries = otService.getAllSurgeries(false);
 		int i = 0;
 		assertThat(surgeries.get(i).getUuid(), is("surgery1"));
-		assertThat(surgeries.get(i).getSchedulingData().getStart(), equalTo(refDate.withTime(11, 0, 0, 0)));
+		assertThat(surgeries.get(i).getSchedulingData().getStart(), equalTo(refDate.withHour(11).toLocalDateTime()));
 		i++;
 		assertThat(surgeries.get(i).getUuid(), is("surgery2"));
-		assertThat(surgeries.get(i).getSchedulingData().getStart(), equalTo(refDate.withTime(11, 0, 0, 0)));
+		assertThat(surgeries.get(i).getSchedulingData().getStart(), equalTo(refDate.withHour(11).toLocalDateTime()));
 		assertThat(surgeries.get(i).getSchedulingData().getLocation(),
 				is(not(surgeries.get(i - 1).getSchedulingData().getLocation())));
 		i++;
 		assertThat(surgeries.get(i).getUuid(), is("surgery3"));
-		assertThat(surgeries.get(i).getSchedulingData().getStart(), equalTo(refDate.plusHours(60)));
+		assertThat(surgeries.get(i).getSchedulingData().getStart(), equalTo(refDate.plusHours(60).toLocalDateTime()));
 		assertThat(surgeries.get(i).getSchedulingData().getLocation().getId(), is(100));
 	}
 
@@ -222,11 +253,11 @@ public class SchedulerTest extends BaseModuleContextSensitiveTest {
 		List<Surgery> surgeries = otService.getAllSurgeries(false);
 		int i = 0;
 		assertThat(surgeries.get(i).getUuid(), is("surgery1"));
-		assertThat(surgeries.get(i).getSchedulingData().getStart(), equalTo(refDate.withTime(11, 0, 0, 0)));
+		assertThat(surgeries.get(i).getSchedulingData().getStart(), equalTo(refDate.withHour(11).toLocalDateTime()));
 		assertThat(surgeries.get(i).getSchedulingData().getLocation().getId(), is(100));
 		i++;
 		assertThat(surgeries.get(i).getUuid(), is("surgery2"));
-		assertThat(surgeries.get(i).getSchedulingData().getStart(), equalTo(refDate.withTime(12, 0, 0, 0)));
+		assertThat(surgeries.get(i).getSchedulingData().getStart(), equalTo(refDate.withHour(12).toLocalDateTime()));
 		assertThat(surgeries.get(i).getSchedulingData().getLocation().getId(), is(100));
 	}
 

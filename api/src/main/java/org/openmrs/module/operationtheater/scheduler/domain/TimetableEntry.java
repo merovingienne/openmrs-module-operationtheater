@@ -1,8 +1,10 @@
 package org.openmrs.module.operationtheater.scheduler.domain;
 
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.openmrs.Location;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
+
+import java.time.ZonedDateTime;
 
 /**
  * Common interface for a timetable entry<br />
@@ -12,9 +14,9 @@ public interface TimetableEntry {
 
 	Location getLocation();
 
-	DateTime getStart();
+	ZonedDateTime getStart();
 
-	DateTime getEnd();
+	ZonedDateTime getEnd();
 
 	/**
 	 * @return length of the chain starting at this element in minutes

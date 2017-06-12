@@ -15,7 +15,7 @@ package org.openmrs.module.operationtheater;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
@@ -29,7 +29,10 @@ import org.openmrs.module.ModuleActivator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.operationtheater.api.OperationTheaterService;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
+
 
 /**
  * This class contains the logic that is run every time this module is either started or stopped.
@@ -130,7 +133,7 @@ public class OperationTheaterModuleActivator implements ModuleActivator, DaemonT
 		pName.setFamilyName("PLACEHOLDER PATIENT");
 		patient.addName(pName);
 
-		patient.setBirthdate(new DateTime(1970, 1, 1, 0, 0).toDate());
+		patient.setBirthdate(Date.from(LocalDate.of(1970,1,1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 		patient.setBirthdateEstimated(false);
 		patient.setGender(gender);
 

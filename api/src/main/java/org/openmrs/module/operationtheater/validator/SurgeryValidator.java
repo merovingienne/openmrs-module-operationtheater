@@ -2,7 +2,7 @@ package org.openmrs.module.operationtheater.validator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.operationtheater.SchedulingData;
@@ -13,6 +13,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 /**
  * Validates attributes on the {@link org.openmrs.module.operationtheater.Surgery} object.
@@ -108,14 +113,14 @@ public class SurgeryValidator implements Validator {
 	}
 
 	private void validateDateStartedField(Surgery surgery, Errors errors) {
-		DateTime dateCreated = new DateTime(surgery.getDateCreated());
-		DateTime dateStarted = surgery.getDateStarted();
+		ZonedDateTime dateCreated = ZonedDateTime.ofInstant(surgery.getDateCreated().toInstant(), ZoneId.systemDefault());
+		LocalDateTime dateStarted = surgery.getDateStarted();
 
 		if (dateStarted == null) {
 			return;
 		}
 
-		if (dateCreated == null || dateStarted.isBefore(dateCreated)) {
+		if (dateCreated == null || dateStarted.isBefore(dateCreated.toLocalDateTime())) {
 			errors.rejectValue("dateStarted", "operationtheater.surgery.validationError.dateStartedInvalid");
 		}
 
@@ -128,9 +133,9 @@ public class SurgeryValidator implements Validator {
 	}
 
 	private void validateDateFinishedField(Surgery surgery, Errors errors) {
-		DateTime dateCreated = new DateTime(surgery.getDateCreated());
-		DateTime dateStarted = surgery.getDateStarted();
-		DateTime dateFinished = surgery.getDateFinished();
+		ZonedDateTime dateCreated = ZonedDateTime.ofInstant(surgery.getDateCreated().toInstant(), ZoneId.systemDefault());
+		LocalDateTime dateStarted = surgery.getDateStarted();
+		LocalDateTime dateFinished = surgery.getDateFinished();
 
 		if (dateFinished == null) {
 			return;

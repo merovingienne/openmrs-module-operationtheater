@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.openmrs.module</groupId>
         <artifactId>operationtheater</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>operationtheater-api</artifactId>
@@ -83,9 +83,28 @@
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>serialization.xstream-api</artifactId>
-            <version>${serializationxstreamVersion}</version>
+            <version>${serialization.xstreamVersion}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>serialization.xstream-api-1.9</artifactId>
+            <version>${serialization.xstreamVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>serialization.xstream-api-1.10</artifactId>
+            <version>${serialization.xstreamVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>serialization.xstream-api-2.0</artifactId>
+            <version>${serialization.xstreamVersion}</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
@@ -97,15 +116,21 @@
         <!-- End OpenMRS modules -->
 
         <!-- joda time -->
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>joda-time</groupId>-->
+            <!--<artifactId>joda-time</artifactId>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+            <!--<groupId>joda-time</groupId>-->
+            <!--<artifactId>joda-time-hibernate</artifactId>-->
+        <!--</dependency>-->
+
 
         <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time-hibernate</artifactId>
+            <groupId>org.threeten</groupId>
+            <artifactId>threeten-extra</artifactId>
         </dependency>
 
         <!-- optaplanner and drools  -->
@@ -157,10 +182,19 @@
 
         <dependency>
             <groupId>org.antlr</groupId>
-            <artifactId>antlr-runtime</artifactId>
-            <version>3.5</version>
+            <artifactId>antlr4</artifactId>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>
+
+
+        <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.hsqldb/hsqldb &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>org.hsqldb</groupId>-->
+            <!--<artifactId>hsqldb</artifactId>-->
+            <!--<version>2.4.0</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
 
         <!-- DBSetup (dbunit alternative) -->
         <dependency>

@@ -3,7 +3,7 @@ package org.openmrs.module.operationtheater.api.db;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.operation.Operation;
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Patient;
@@ -17,6 +17,11 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static com.ninja_squad.dbsetup.Operations.sequenceOf;
@@ -42,7 +47,7 @@ public class SurgeryDAOTest extends BaseModuleContextSensitiveTest {
 
 	private PatientService service;
 
-	private DateTime refDate = new DateTime().withTimeAtStartOfDay();
+	private LocalDateTime refDate = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
 
 	@Before
 	public void setUp() throws Exception {
@@ -59,13 +64,13 @@ public class SurgeryDAOTest extends BaseModuleContextSensitiveTest {
 						.build(),
 				insertInto(DbUtil.Config.SCHEDULING_DATA)
 						.columns("start", "end", "location_id")
-						.values(refDate.minusDays(2).toDate(), refDate.minusDays(2).plusHours(1).toDate(), 100)
-						.values(refDate.plusDays(2).toDate(), refDate.plusDays(2).plusHours(1).toDate(), 100)
-						.values(refDate.toDate(), refDate.plusHours(1).toDate(), 100)
+						.values(Date.from(refDate.minusDays(2).toInstant(ZoneOffset.UTC)), Date.from(refDate.minusDays(2).plusHours(1).toInstant(ZoneOffset.UTC)), 100)
+						.values(Date.from(refDate.plusDays(2).toInstant(ZoneOffset.UTC)), Date.from(refDate.plusDays(2).plusHours(1).toInstant(ZoneOffset.UTC)), 100)
+						.values(Date.from(refDate.toInstant(ZoneOffset.UTC)), Date.from(refDate.plusHours(1).toInstant(ZoneOffset.UTC)), 100)
 						.build(),
 				insertInto(DbUtil.Config.SURGERY, "voided")
 						.columns("patient_id", "procedure_id", "scheduling_data_id", "voided", "date_finished")
-						.values(100, 1, 1, false, new DateTime().toDate())
+						.values(100, 1, 1, false, LocalDate.now())
 						.values(100, 1, 2, true, null)
 						.values(101, 2, 3, false, null)
 						.values(101, 2, 3, true, null)
@@ -220,7 +225,7 @@ public class SurgeryDAOTest extends BaseModuleContextSensitiveTest {
 
 	/**
 	 * @verifies return all unvoided surgeries that are scheduled between from and to date
-	 * @see SurgeryDAO#getScheduledSurgeries(org.joda.time.DateTime, org.joda.time.DateTime)
+	 * @see SurgeryDAO#getScheduledSurgeries(LocalDate, LocalDate)
 	 */
 	@Test
 	public void getScheduledSurgeries_shouldReturnAllUnvoidedSurgeriesThatAreScheduledBetweenFromAndToDate()
@@ -228,7 +233,8 @@ public class SurgeryDAOTest extends BaseModuleContextSensitiveTest {
 		setUpDb();
 
 		//call function under test
-		List<Surgery> surgeryList = surgeryDAO.getScheduledSurgeries(refDate, refDate.plusDays(1));
+		List<Surgery> surgeryList = surgeryDAO.getScheduledSurgeries(
+				refDate, refDate.plusDays(1));
 
 		//verify
 		assertThat(surgeryList, hasSize(1));
@@ -237,7 +243,7 @@ public class SurgeryDAOTest extends BaseModuleContextSensitiveTest {
 
 	/**
 	 * @verifies return all unvoided surgeries that are started before dateTime but are not finished
-	 * @see SurgeryDAO#getAllOngoingSurgeries(org.joda.time.DateTime)
+	 * @see SurgeryDAO#getAllOngoingSurgeries(LocalDateTime)
 	 */
 	@Test
 	public void getAllOngoingSurgeries_shouldReturnAllUnvoidedSurgeriesThatAreStartedBeforeDateTimeButAreNotFinished()
@@ -252,11 +258,18 @@ public class SurgeryDAOTest extends BaseModuleContextSensitiveTest {
 						.build(),
 				insertInto(DbUtil.Config.SURGERY, "voided")
 						.columns("patient_id", "procedure_id", "voided", "date_started", "date_finished")
-						.values(100, 1, false, refDate.plusHours(11).toDate(), refDate.plusHours(13).toDate())
-						.values(100, 1, false, refDate.plusHours(11).toDate(),
-								refDate.plusHours(11).plusMinutes(45).toDate())
-						.values(100, 1, false, refDate.plusHours(11).toDate(), null)
-						.values(100, 1, true, refDate.plusHours(11).toDate(), refDate.plusHours(13).toDate())
+						.values(100, 1, false,
+								Date.from(refDate.plusHours(11).toInstant(ZoneOffset.UTC)),
+								Date.from(refDate.plusHours(13).toInstant(ZoneOffset.UTC)))
+						.values(100, 1, false,
+								Date.from(refDate.plusHours(11).toInstant(ZoneOffset.UTC)),
+								Date.from(refDate.plusHours(11).plusMinutes(45).toInstant(ZoneOffset.UTC)))
+						.values(100, 1, false,
+								Date.from(refDate.plusHours(11).toInstant(ZoneOffset.UTC)),
+								null)
+						.values(100, 1, true,
+								Date.from(refDate.plusHours(11).toInstant(ZoneOffset.UTC)),
+								refDate.plusHours(13).toInstant(ZoneOffset.UTC))
 						.build()
 		);
 		DbSetup dbSetup = DbUtil.buildDBSetup(operation, getConnection(), useInMemoryDatabase());
@@ -273,7 +286,7 @@ public class SurgeryDAOTest extends BaseModuleContextSensitiveTest {
 
 	/**
 	 * @verifies return empty list if dateTime is null
-	 * @see SurgeryDAO#getAllOngoingSurgeries(org.joda.time.DateTime)
+	 * @see SurgeryDAO#getAllOngoingSurgeries(LocalDateTime)
 	 */
 	@Test
 	public void getAllOngoingSurgeries_shouldReturnEmptyListIfDateTimeIsNull() throws Exception {

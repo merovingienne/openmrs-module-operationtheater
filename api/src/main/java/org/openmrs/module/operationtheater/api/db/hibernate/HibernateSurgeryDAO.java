@@ -17,7 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
 import org.openmrs.Patient;
 import org.openmrs.module.operationtheater.Surgery;
 import org.openmrs.module.operationtheater.api.db.OperationTheaterDAO;
@@ -25,6 +25,7 @@ import org.openmrs.module.operationtheater.api.db.SurgeryDAO;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -64,7 +65,7 @@ public class HibernateSurgeryDAO extends HibernateGenericDAO<Surgery> implements
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Surgery> getScheduledSurgeries(DateTime from, DateTime to) {
+	public List<Surgery> getScheduledSurgeries(LocalDateTime from, LocalDateTime to) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Surgery.class);
 		criteria.add(Restrictions.eq("voided", false));
 
@@ -84,7 +85,7 @@ public class HibernateSurgeryDAO extends HibernateGenericDAO<Surgery> implements
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Surgery> getAllOngoingSurgeries(DateTime dateTime) {
+	public List<Surgery> getAllOngoingSurgeries(LocalDateTime dateTime) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Surgery.class);
 
 		criteria.add(Restrictions.eq("voided", false));

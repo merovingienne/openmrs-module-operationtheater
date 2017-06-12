@@ -1,6 +1,9 @@
 package org.openmrs.module.operationtheater;
 
-import org.joda.time.DateTime;
+//import org.joda.time.DateTime;
+
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 /**
  * Class used to obtain DateTime object of the current time<br />
@@ -8,7 +11,11 @@ import org.joda.time.DateTime;
  */
 public class Time {
 
-	public DateTime now() {
-		return new DateTime();
+//	public DateTime now() {
+//		return new DateTime();
+//	}
+
+	public ZonedDateTime now() {
+		return ZonedDateTime.now();
 	}
 }
