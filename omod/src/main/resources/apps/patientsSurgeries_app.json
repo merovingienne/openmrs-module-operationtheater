@@ -8,7 +8,7 @@
                 "id": "operationtheater.patientsSurgeriesPatientDashboardLink",
                 "extensionPointId": "patientDashboard.overallActions",
                 "type": "link",
-                "label": "${project.parent.artifactId}.patientssurgeries.app.button.label",
+                "label": "${project.parent.artifactId}.patientsSurgeries.app.button.label",
                 "url": "${project.parent.artifactId}/patientsSurgeries.page?patientId={{patientId}}",
                 "icon": "icon-folder-open",
                 "requiredPrivilege": "App: coreapps.findPatient" //TODO edit

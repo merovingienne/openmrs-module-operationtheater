@@ -32,7 +32,6 @@ import org.openmrs.ui.framework.annotation.SpringBean;
 import org.openmrs.ui.framework.fragment.action.FailureResult;
 import org.openmrs.ui.framework.fragment.action.FragmentActionResult;
 import org.openmrs.ui.framework.fragment.action.SuccessResult;
-import org.springframework.cglib.core.Local;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -311,12 +310,14 @@ public class SchedulingFragmentController {
 		}
 
 		Surgery surgery = new Surgery();
+		surgery.setDateCreated(Date.from(Instant.now()));
 
 		Patient placeholder = patientService.getPatientByUuid(OTMetadata.PLACEHOLDER_PATIENT_UUID);
 		surgery.setPatient(placeholder);
 
 		Procedure procedure = otService.getProcedureByUuid(OTMetadata.PLACEHOLDER_PROCEDURE_UUID);
 		surgery.setProcedure(procedure);
+
 
 		SchedulingData schedulingData = new SchedulingData();
 		schedulingData.setStart(plannedStart);
@@ -456,13 +457,13 @@ public class SchedulingFragmentController {
 			}
 
 			DateTimeFormatter timeFormatter = OTMetadata.AVAILABLE_TIME_FORMATTER;
-			LocalDateTime beginTime = LocalDateTime.parse((String) defaultBegin.getValue(), timeFormatter);
+			LocalTime beginTime = LocalTime.parse((String) defaultBegin.getValue(), timeFormatter);
 			LocalTime endTime = LocalTime.parse((String) defaultEnd.getValue(), timeFormatter);
 
 			start = dateFormatter
-					.format(startDate.withHour(beginTime.getHour()).withMinute(beginTime.getMinute()).truncatedTo(ChronoUnit.MINUTES));
+					.format(startDate.withHour(beginTime.getHour()).withMinute(beginTime.getMinute()));
 			end = dateFormatter.
-					format(startDate.withHour(endTime.getHour()).withMinute(endTime.getMinute()).truncatedTo(ChronoUnit.MINUTES));
+					format(startDate.withHour(endTime.getHour()).withMinute(endTime.getMinute()));
 		}
 
 		String beginOfDay = dateFormatter.format(startDate);

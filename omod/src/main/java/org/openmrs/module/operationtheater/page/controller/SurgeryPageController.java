@@ -51,7 +51,7 @@ public class SurgeryPageController {
 	                         @SpringBean("applicationEventService") ApplicationEventService applicationEventService,
 	                         UiSessionContext sessionContext) {
 
-		if (patient.isVoided() || patient.isPersonVoided()) {
+		if (patient.getVoided() || patient.getPersonVoided()) {
 			return new Redirect("coreapps", "patientdashboard/deletedPatient", "patientId=" + patient.getId());
 		}
 
