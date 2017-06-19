@@ -20,12 +20,10 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class SurgeryFragmentController {
 
@@ -185,6 +183,7 @@ public class SurgeryFragmentController {
 		surgery.setUuid(surgeryUuid);
 		surgery.setPatient(patient);
 		surgery.setProcedure(procedure);
+		surgery.setDateCreated(Date.from(Instant.now()));
 
 		otService.saveSurgery(surgery);
 		return new SuccessResult(ui.message("operationtheater.surgery.createdSuccessfully"));
