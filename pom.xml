@@ -59,7 +59,7 @@
         <!--<serializationxstreamVersion>0.2.12</serializationxstreamVersion>-->
 
         <optaplannerVersion>6.0.1.Final</optaplannerVersion>
-        <droolsCompilerVersion>6.0.1.Final</droolsCompilerVersion>
+        <droolsCompilerVersion>7.0.0.Final</droolsCompilerVersion>
 
         <jodatimeVersion>2.3</jodatimeVersion>
         <jodatimeHibernateVersion>1.3</jodatimeHibernateVersion>
