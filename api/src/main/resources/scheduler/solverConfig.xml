@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solver>
-    <environmentMode>PRODUCTION</environmentMode>
+    <environmentMode>NON_REPRODUCIBLE</environmentMode>
 
     <!-- model definition -->
     <solutionClass>org.openmrs.module.operationtheater.scheduler.domain.Timetable</solutionClass>
-    <planningEntityClass>org.openmrs.module.operationtheater.scheduler.domain.PlannedSurgery</planningEntityClass>
+    <entityClass>org.openmrs.module.operationtheater.scheduler.domain.PlannedSurgery</entityClass>
 
     <!-- score function definition -->
     <scoreDirectorFactory>
-        <scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
-        <scoreDrl>/scheduler/scoreRules.drl</scoreDrl>
+        <!--<scoreDefinitionType>HARD_SOFT</scoreDefinitionType>     Removed as of OP 7.0.0.Beta2   -->
+        <scoreDrl>scheduler/scoreRules.drl</scoreDrl>
     </scoreDirectorFactory>
 
     <!-- configuration of the optimization algorithm(s) -->
     <termination>
-        <maximumSecondsSpend>10</maximumSecondsSpend>
-        <scoreAttained>0hard/0soft</scoreAttained>
+        <secondsSpentLimit>10</secondsSpentLimit>
+        <bestScoreLimit>0hard/0soft</bestScoreLimit>
     </termination>
     <constructionHeuristic>
         <constructionHeuristicType>FIRST_FIT</constructionHeuristicType>

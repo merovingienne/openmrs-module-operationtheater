@@ -20,6 +20,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 import org.threeten.extra.Interval;
 
 /**
@@ -92,15 +93,18 @@ public class PlannedSurgery implements TimetableEntry {
 	}
 
 	public Surgery getSurgery() {
+
 		return surgery;
 	}
 
 	public void setSurgery(Surgery surgery) {
+
 		this.surgery = surgery;
 	}
 
-	@PlanningVariable(chained = true, valueRangeProviderRefs = { "anchorRange", "plannedSurgeryRange" })
+	@PlanningVariable(graphType = PlanningVariableGraphType.CHAINED, valueRangeProviderRefs = { "anchorRange", "plannedSurgeryRange" })
 	public TimetableEntry getPreviousTimetableEntry() {
+
 		return previousTimetableEntry;
 	}
 

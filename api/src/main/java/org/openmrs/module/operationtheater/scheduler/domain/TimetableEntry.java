@@ -2,7 +2,7 @@ package org.openmrs.module.operationtheater.scheduler.domain;
 
 //import org.joda.time.DateTime;
 import org.openmrs.Location;
-import org.optaplanner.core.api.domain.variable.PlanningVariable;
+import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
 
 import java.time.ZonedDateTime;
 
@@ -23,7 +23,7 @@ public interface TimetableEntry {
 	 */
 	int getChainLengthInMinutes();
 
-	@PlanningVariable(mappedBy = "previousTimetableEntry")
+	@InverseRelationShadowVariable(sourceVariableName = "previousTimetableEntry")
 	TimetableEntry getNextTimetableEntry();
 
 	void setNextTimetableEntry(TimetableEntry entry);

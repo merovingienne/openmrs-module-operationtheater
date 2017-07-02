@@ -4,10 +4,12 @@ import org.openmrs.Provider;
 import org.openmrs.module.operationtheater.api.OperationTheaterService;
 import org.openmrs.module.operationtheater.scheduler.solver.SurgeryConflict;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
+import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
-import org.optaplanner.core.api.domain.value.ValueRangeProvider;
+import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty;
+import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
-import org.optaplanner.core.impl.solution.Solution;
+import org.optaplanner.core.api.domain.solution.Solution;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +22,7 @@ import java.util.Set;
  * Also used to act as a range provider for the planning variables
  */
 @PlanningSolution
-public class Timetable implements Solution<HardSoftScore> {
+public class Timetable {
 
 	//problem facts  (don't change value during planning)
 	private List<Anchor> anchors;
@@ -30,28 +32,14 @@ public class Timetable implements Solution<HardSoftScore> {
 
 	private HardSoftScore score;
 
-	@Override
+	@PlanningScore
 	public HardSoftScore getScore() {
 		return score;
 	}
-
-	@Override
 	public void setScore(HardSoftScore hardSoftScore) {
 		score = hardSoftScore;
 	}
 
-	/**
-	 * @return a collection with all problem facts
-	 * @should return all problem facts without the planning entities
-	 */
-	@Override
-	public Collection<?> getProblemFacts() {
-		//planning entities are added automatically -> don't add them here
-		List<Object> facts = new ArrayList<Object>();
-		facts.addAll(anchors);
-		facts.addAll(calculatePlannedSurgeryConflictList());
-		return facts;
-	}
 
 	@Override
 	public String toString() {
@@ -61,6 +49,16 @@ public class Timetable implements Solution<HardSoftScore> {
 				'}';
 	}
 
+
+    /**
+     * getProblemFacts() replaced with
+     * ProblemFactCollectionProperty annotation directly on
+     * every problem fact getter.
+     * @see{https://www.optaplanner.org/download/upgradeRecipe/upgradeRecipe7.0.html}
+     */
+
+
+    @ProblemFactCollectionProperty
 	private Collection<?> calculatePlannedSurgeryConflictList() {
 		List<SurgeryConflict> conflicts = new ArrayList<SurgeryConflict>();
 		for (PlannedSurgery left : plannedSurgeries) {
@@ -90,6 +88,7 @@ public class Timetable implements Solution<HardSoftScore> {
 		return conflicts;
 	}
 
+    @ProblemFactCollectionProperty
 	@ValueRangeProvider(id = "anchorRange")
 	public List<Anchor> getAnchors() {
 		return anchors;

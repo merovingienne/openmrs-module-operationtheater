@@ -13,10 +13,7 @@
 
     <developers>
         <developer>
-            <name>Lukas Breitwieser</name>
-        </developer>
-        <developer>
-            <name>Chanuka Wijayakoon</name>
+            <name>Lukas Breitwieser, Chanuka Wijayakoon</name>
         </developer>
     </developers>
 
@@ -58,7 +55,7 @@
 
         <!--<serializationxstreamVersion>0.2.12</serializationxstreamVersion>-->
 
-        <optaplannerVersion>6.0.1.Final</optaplannerVersion>
+        <optaplannerVersion>7.0.0.Final</optaplannerVersion>
         <droolsCompilerVersion>6.0.1.Final</droolsCompilerVersion>
 
         <jodatimeVersion>2.3</jodatimeVersion>

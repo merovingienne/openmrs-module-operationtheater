@@ -23,7 +23,6 @@ import org.openmrs.module.operationtheater.scheduler.domain.TimetableEntry;
 import org.openmrs.module.operationtheater.scheduler.solver.TimetableEntryComparator;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
-import org.optaplanner.core.config.solver.XmlSolverFactory;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -42,20 +41,20 @@ public enum Scheduler {
 
 	private Time time = new Time();
 
-	private SolverFactory solverFactory;
+	private SolverFactory<Timetable> solverFactory;
 
 	private OperationTheaterService otService;
 
 	private LocationService locationService;
 
-	private Solver solver;
+	private Solver<Timetable> solver;
 
 	private Thread solverThread;
 
 	private Status status = Status.PRISTINE;
 
 	private Scheduler() {
-		solverFactory = new XmlSolverFactory("/scheduler/solverConfig.xml");
+		solverFactory = SolverFactory.createFromXmlResource("scheduler/solverConfig.xml");
 	}
 
 	/**
@@ -65,7 +64,7 @@ public enum Scheduler {
 	 * @param
 	 */
 	public void reset() {
-		solverFactory = new XmlSolverFactory("/scheduler/solverConfig.xml");
+		solverFactory = SolverFactory.createFromXmlResource("scheduler/solverConfig.xml");
 		solver = null;
 		solverThread = null;
 		status = Status.PRISTINE;
@@ -119,9 +118,8 @@ public enum Scheduler {
 					final Timetable unsolvedTimetable = setupInitialSolution(planningWindow);
 
 					// Solve problem
-					solver.setPlanningProblem(unsolvedTimetable);
-					solver.solve();
-					Timetable solvedTimetable = (Timetable) solver.getBestSolution();
+					// returns Solution class.
+					Timetable solvedTimetable = solver.solve(unsolvedTimetable);
 
 					//set surgeries planned begin and finished attributes
 					solvedTimetable.persistSolution(otService);

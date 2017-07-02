@@ -26,7 +26,7 @@ public class TimetableTest {
 
 	/**
 	 * @verifies return all problem facts without the planning entities
-	 * @see Timetable#getProblemFacts()
+	 *
 	 */
 	@Test
 	public void getProblemFacts_shouldReturnAllProblemFactsWithoutThePlanningEntities() throws Exception {
@@ -62,17 +62,19 @@ public class TimetableTest {
 
 		timetable.setPlannedSurgeries(plannedSurgeries);
 
-		//call method under test
-		Collection<?> problemFacts = timetable.getProblemFacts();
 
-		//verify contains all problem facts
-		assertThat(problemFacts, hasSize(3));
-		assertTrue(problemFacts.containsAll(anchors));
-		assertTrue(problemFacts.contains(new SurgeryConflict(surgery1, surgery2, 2)));
-
-		//verify contains NO planning entities
-		assertFalse(problemFacts.contains(ps1));
-		assertFalse(problemFacts.contains(ps2));
+		//Problem fact check removed due to getProblemFacts() method removal
+//		//call method under test
+//		Collection<?> problemFacts = timetable.getProblemFacts();
+//
+//		//verify contains all problem facts
+//		assertThat(problemFacts, hasSize(3));
+//		assertTrue(problemFacts.containsAll(anchors));
+//		assertTrue(problemFacts.contains(new SurgeryConflict(surgery1, surgery2, 2)));
+//
+//		//verify contains NO planning entities
+//		assertFalse(problemFacts.contains(ps1));
+//		assertFalse(problemFacts.contains(ps2));
 	}
 
 	/**
