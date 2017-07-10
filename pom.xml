@@ -56,10 +56,10 @@
         <!--<serializationxstreamVersion>0.2.12</serializationxstreamVersion>-->
 
         <optaplannerVersion>7.0.0.Final</optaplannerVersion>
-        <droolsCompilerVersion>6.0.1.Final</droolsCompilerVersion>
+        <!--<droolsCompilerVersion>6.0.1.Final</droolsCompilerVersion>-->
 
-        <jodatimeVersion>2.3</jodatimeVersion>
-        <jodatimeHibernateVersion>1.3</jodatimeHibernateVersion>
+        <!--<jodatimeVersion>2.3</jodatimeVersion>-->
+        <!--<jodatimeHibernateVersion>1.3</jodatimeHibernateVersion>-->
 
         <serialization.xstreamVersion>0.2.12</serialization.xstreamVersion>
     </properties>
@@ -232,7 +232,7 @@
             <dependency>
                 <groupId>org.optaplanner</groupId>
                 <artifactId>optaplanner</artifactId>
-                <version>6.0.1.Final</version>
+                <version>${optaplannerVersion}</version>
                 <type>pom</type>
             </dependency>
 
@@ -243,20 +243,7 @@
                 <type>jar</type>
             </dependency>
 
-            <!--<dependency>-->
-            <!--<groupId>org.optaplanner</groupId>-->
-            <!--<artifactId>optaplanner-benchmark</artifactId>-->
-            <!--<version>${optaplannerVersion}</version>-->
-            <!--<type>jar</type>-->
-            <!--</dependency>-->
 
-            <dependency>
-                <groupId>org.drools</groupId>
-                <artifactId>drools-compiler</artifactId>
-                <!--<scope>test</scope>-->
-                <version>${droolsCompilerVersion}</version>
-                <type>jar</type>
-            </dependency>
 
 
 

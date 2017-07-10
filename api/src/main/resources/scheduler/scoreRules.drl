@@ -79,7 +79,7 @@ rule "firstComeFirstServed"
         $surgery: PlannedSurgery($start : start, start != null, location != null)
     then
         ZonedDateTime $created = ZonedDateTime.ofInstant($surgery.getSurgery().getDateCreated().toInstant(), ZoneId.systemDefault());
-        int hours = Duration.between($created, $start).toHours();
+        int hours = (int) Duration.between($created, $start).toHours();
 
         scoreHolder.addSoftConstraintMatch(kcontext, -hours);
 end

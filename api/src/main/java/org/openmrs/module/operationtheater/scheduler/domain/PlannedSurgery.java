@@ -88,8 +88,13 @@ public class PlannedSurgery implements TimetableEntry {
 
 		Interval available = otService.getLocationAvailableTime(location, start.toLocalDate());
 		Interval scheduled = Interval.of(start.toInstant(), end.toInstant());
-		Interval overlap = scheduled.intersection(available);
-		return !scheduled.equals(overlap);
+		Interval overlap = null;
+		if (available.isConnected(scheduled)){
+			overlap = scheduled.intersection(available);
+			return !scheduled.equals(overlap);
+		}
+
+		return true;
 	}
 
 	public Surgery getSurgery() {
