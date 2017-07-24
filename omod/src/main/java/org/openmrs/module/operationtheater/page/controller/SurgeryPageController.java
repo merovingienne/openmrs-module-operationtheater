@@ -95,7 +95,7 @@ public class SurgeryPageController {
 
 		AppContextModel contextModel = sessionContext.generateAppContextModel();
 		contextModel.put("patientId", patient.getId());
-		contextModel.put("patientDead", patient.isDead());
+		contextModel.put("patientDead", patient.getDead());
 
 		applicationEventService.patientViewed(patient, sessionContext.getCurrentUser());
 

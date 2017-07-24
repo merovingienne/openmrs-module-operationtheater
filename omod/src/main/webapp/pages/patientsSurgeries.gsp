@@ -22,6 +22,12 @@ ${ui.includeFragment("coreapps", "patientHeader", [patient: patient.patient, act
         }
     });
 
+    function viewSurgery(surgeryId, patientId){
+        window.location.href = "${ui.pageLink("operationtheater", "surgery")}"
+            + "?surgeryId=" + surgeryId
+            + "&patientId=" + patientId;
+    }
+
 </script>
 <style>
 /* Todo refactor to compass */
@@ -72,7 +78,7 @@ ${ui.includeFragment("coreapps", "patientHeader", [patient: patient.patient, act
             <tbody>
             <% surgeryList.each { surgery -> %>
 
-            <tr>
+            <tr onclick=viewSurgery('${surgery.id}','${surgery.patient.id}') style="cursor: pointer">
                 <td>${ui.format(surgery.dateCreated)}</td>
                 <td>${ui.format(surgery.procedure.name)}</td>
                 <td>${ui.format(surgery.procedure.description)}</td>
