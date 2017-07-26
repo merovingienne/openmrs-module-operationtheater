@@ -15,9 +15,11 @@ package org.openmrs.module.operationtheater.page.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Allergies;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
+import org.openmrs.api.PatientService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appui.UiSessionContext;
@@ -46,6 +48,7 @@ public class SurgeryPageController {
 	                         @RequestParam(value = "surgeryId", required = false) Surgery surgery,
 	                         @SpringBean OperationTheaterService otService,
 	                         @SpringBean("providerService") ProviderService providerService,
+	                         @SpringBean("patientService") PatientService patientService,
 	                         @InjectBeans PatientDomainWrapper patientDomainWrapper,
 	                         @SpringBean("adtService") AdtService adtService,
 	                         @SpringBean("applicationEventService") ApplicationEventService applicationEventService,
@@ -98,6 +101,11 @@ public class SurgeryPageController {
 		contextModel.put("patientDead", patient.getDead());
 
 		applicationEventService.patientViewed(patient, sessionContext.getCurrentUser());
+
+		Allergies allergies = patientService.getAllergies(patient);
+
+		model.addAttribute( "allergies", allergies);
+
 
 		return null;
 	}

@@ -65,6 +65,13 @@ input.error {
 form fieldset {
     min-width: 95%;
     padding: 10px;
+    border-color: #eeeeee;
+}
+
+fieldset {
+    min-width: 95%;
+    padding: 10px;
+    border-color: #eeeeee;
 }
 
 </style>
@@ -143,78 +150,118 @@ form fieldset {
     });
 </script>
 
-<h2>
-    ${ui.message("operationtheater.surgery.page.title")}
-</h2>
 
-<form class="simple-form-ui" id="surgeryForm" autocomplete="off"
 
-      xmlns:xlink="http://www.w3.org/1999/xlink"
 
->
+<!- Main content (left hand side) -!>
+
+
+<div style="padding: 20px; overflow: hidden">
+
+    <h2>
+        ${ui.message("operationtheater.surgery.page.title")}
+    </h2>
+
+
     <div style="
     float: left;
     width: 70%;
     ">
+        <form class="simple-form-ui" id="surgeryForm" autocomplete="off">
+            <fieldset id="replaceEmergencyPlaceholderPatient" ${emergencyPatient ? '' : 'style="display:none"'}>
+                <legend>${ui.message("operationtheater.surgery.page.fieldset.replaceEmergencyPlaceholderPatient")}</legend>
 
-        <fieldset id="replaceEmergencyPlaceholderPatient" ${emergencyPatient ? '' : 'style="display:none"'}>
-            <legend>${ui.message("operationtheater.surgery.page.fieldset.replaceEmergencyPlaceholderPatient")}</legend>
+                <input type="text" id="patient-search" placeholder="${ui.message("coreapps.findPatient.search.placeholder")}"
+                       autocomplete="off"/>
 
-            <input type="text" id="patient-search" placeholder="${ui.message("coreapps.findPatient.search.placeholder")}"
-                   autocomplete="off"/>
+                <div id="patient-search-results"></div>
+            </fieldset>
 
-            <div id="patient-search-results"></div>
-        </fieldset>
-
-        <fieldset>
-            <legend>${ui.message("operationtheater.surgery.page.fieldset.procedure")}</legend>
-            <!-- TODO maxlength should be managed centrally in the POJO-->
-            ${ui.includeFragment("uicommons", "field/text", [
-                    label        : ui.message("general.name"),
-                    formFieldName: "surgeryProcedure",
-                    id           : "surgeryProcedure",
-                    maxLength    : 101,
-                    initialValue : (surgery.procedure.name ?: '')
-            ])}
-            <a class="button"
-               id="setProcedureButton">${surgery.procedure.name == null ? ui.message("operationtheater.surgery.page.button.createSurgery") : ui.message("general.save")}</a>
-
-        </fieldset>
-
-        <fieldset id="surgicalTeamFieldset" ${surgery.procedure.name ?: 'style="display:none"'}>
-            <legend>${ui.message("operationtheater.surgery.page.fieldset.surgicalTeam")}</legend>
-
-            <div id="surgical-team-list">
-                <table id="surgical-team-table" empty-value-message='${ui.message("uicommons.dataTable.emptyTable")}'>
-                    <thead>
-                    <tr>
-                        <th style="width: 80%">${ui.message("general.name")}</th>
-                        <th style="width: 20%">${ui.message("general.action")}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-
-                    </tbody>
-                </table>
-            </div>
-
-            <p>
+            <fieldset>
+                <legend>${ui.message("operationtheater.surgery.page.fieldset.procedure")}</legend>
+                <!-- TODO maxlength should be managed centrally in the POJO-->
                 ${ui.includeFragment("uicommons", "field/text", [
-                        label        : "Add Provider",
-                        formFieldName: "addProviderTextfield",
-                        id           : "addProviderTextfield",
+                        label        : ui.message("general.name"),
+                        formFieldName: "surgeryProcedure",
+                        id           : "surgeryProcedure",
                         maxLength    : 101,
-                        initialValue : ""
+                        initialValue : (surgery.procedure.name ?: '')
                 ])}
-                <a class="button" id="addProviderButton">${ui.message("general.add")}</a>
-            </p>
+                <a class="button"
+                   id="setProcedureButton">${surgery.procedure.name == null ? ui.message("operationtheater.surgery.page.button.createSurgery") : ui.message("general.save")}</a>
 
-        </fieldset>
+            </fieldset>
 
+            <fieldset id="surgicalTeamFieldset" ${surgery.procedure.name ?: 'style="display:none"'}>
+                <legend>${ui.message("operationtheater.surgery.page.fieldset.surgicalTeam")}</legend>
+
+                <div id="surgical-team-list">
+                    <table id="surgical-team-table" empty-value-message='${ui.message("uicommons.dataTable.emptyTable")}'>
+                        <thead>
+                        <tr>
+                            <th style="width: 80%">${ui.message("general.name")}</th>
+                            <th style="width: 20%">${ui.message("general.action")}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    ${ui.includeFragment("uicommons", "field/text", [
+                            label        : "Add Provider",
+                            formFieldName: "addProviderTextfield",
+                            id           : "addProviderTextfield",
+                            maxLength    : 101,
+                            initialValue : ""
+                    ])}
+                    <a class="button" id="addProviderButton">${ui.message("general.add")}</a>
+                </p>
+
+            </fieldset>
+
+        </form>
+
+
+        <h3>Allergies</h3>
+
+        <% if (allergies.size() > 0) { %>
+
+        <table id="allergies-table">
+            <thead>
+            <th>Allergen</th>
+            <th>Reactions</th>
+            </thead>
+            <% allergies.each { allergy -> %>
+            <tr>
+                <td>
+                    ${ allergy.getAllergen().toString() }
+                </td>
+                <td>
+                    <% allergy.getReactions().each { reaction -> %>
+
+                    ${ reaction.toString()},
+                    <% } %>
+                </td>
+            </tr>
+            <% } %>
+
+            <tbody>
+
+            </tbody>
+        </table>
+
+        <%  } else { %>
+        <p>There are no allergies</p>
+        <% } %>
 
 
     </div>
 
+
+    <!- Right hand column -!>
 
     <div style="float: right;
     width: 30%;">
@@ -222,64 +269,63 @@ form fieldset {
         <fieldset id="workflowFieldset" ${surgery.procedure.name ?: 'style="display:none"'}>
 
             <legend>Data</legend>
-        <div class="action-section">
-            <h3>General Actions</h3>
+            <div class="action-section">
+                <h3>General Actions</h3>
 
-            <ul class="float-left">
-
-
-                <li class="float-left">
-                    <a href="/openmrs/operationtheater/patientsSurgeries.page?patientId=8&amp;returnUrl=%2Fopenmrs%2Fcoreapps%2Fclinicianfacing%2Fpatient.page%3FpatientId%3D8%26" id="operationtheater.patientsSurgeriesPatientDashboardLink" class="float-left">
-                        <i class="icon-folder-open float-left"></i>
-                        Open Surgeries
-                    </a>
+                <ul class="float-left">
 
 
-                </li>
+                    <li class="float-left">
+                        <a href="/openmrs/operationtheater/patientsSurgeries.page?patientId=8&amp;returnUrl=%2Fopenmrs%2Fcoreapps%2Fclinicianfacing%2Fpatient.page%3FpatientId%3D8%26" id="operationtheater.patientsSurgeriesPatientDashboardLink" class="float-left">
+                            <i class="icon-folder-open float-left"></i>
+                            Open Surgeries
+                        </a>
 
 
-                <li>
-                    <a id="startSurgeryButton">
-                            <svg class="icon-custom" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 35 35"><title>  play2</title><path d="M16 0c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16-7.2-16-16-16zM16 29c-7.2 0-13-5.8-13-13s5.8-13 13-13 13 5.8 13 13-5.8 13-13 13zM12 9l12 7-12 7z"/></svg>
-                        ${ui.message("operationtheater.surgery.page.button.beginSurgery")}
-                    </a>
-                </li>
+                    </li>
 
 
-                <li>
-                    <a id="finishSurgeryButton">${ui.message("operationtheater.surgery.page.button.finishSurgery")}</a>
-                </li>
+                    <li>
+                        <a id="startSurgeryButton">
+                            <svg class="icon-custom" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 35 35">
+                                <path d="M16 0c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16-7.2-16-16-16zM16 29c-7.2 0-13-5.8-13-13s5.8-13 13-13 13 5.8 13 13-5.8 13-13 13zM12 9l12 7-12 7z"/>
+                            </svg>
+                            ${ui.message("operationtheater.surgery.page.button.beginSurgery")}
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <svg class="icon-custom" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 35 35">
+                            <path d="M16 0c-8.837 0-16 7.163-16 16s7.163 16 16 16 16-7.163 16-16-7.163-16-16-16zM16 29c-7.18 0-13-5.82-13-13s5.82-13 13-13 13 5.82 13 13-5.82 13-13 13zM10 10h12v12h-12z"></path>
+                        </svg>
+                        <a id="finishSurgeryButton">${ui.message("operationtheater.surgery.page.button.finishSurgery")}</a>
+                    </li>
 
 
 
-                <h3>Workflow</h3>
+                    <h3>Workflow</h3>
 
-                <table id="timestamp-table">
-                    <thead>
-                    <tr>
-                        <th>${ui.message("operationtheater.surgery.page.tableColumn.event")}</th>
-                        <th>${ui.message("operationtheater.surgery.page.tableColumn.date")}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+                    <table id="timestamp-table">
+                        <thead>
+                        <tr>
+                            <th>${ui.message("operationtheater.surgery.page.tableColumn.event")}</th>
+                            <th>${ui.message("operationtheater.surgery.page.tableColumn.date")}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
 
-                    </tbody>
-                </table>
-
-
-            </ul>
-
-        </div>
-
-
+                        </tbody>
+                    </table>
 
 
 
 
-            <p>
+                </ul>
 
-        </p>
+            </div>
         </fieldset>
 
     </div>
-</form>
+
+</div>
