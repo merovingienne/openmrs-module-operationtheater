@@ -15,6 +15,7 @@
     ui.includeCss("referenceapplication", "referenceapplication.css")
     ui.includeCss("coreapps", "findpatient/findPatient.css")
     ui.includeCss("uicommons", "datatables/dataTables_jui.css")
+
 %>
 
 
@@ -26,7 +27,7 @@
         { label: "${ui.message("operationtheater.patientsSurgeries.breadcrumbLabel")}",
             link: '${ui.pageLink("operationtheater", "patientsSurgeries", [patientId: patient.patient.id])}'},
         { label: "${surgery.procedure.name?surgery.procedure.name: ui.message("operationtheater.patientsSurgeries.button.new")}"}
-    ]
+    ];
     var patient = { id: ${ patient.id } };
 </script>
 
@@ -110,6 +111,7 @@ fieldset {
         workflow.init("${surgery.uuid}");
 
 
+
         var widgetConfig = {
             initialPatients: [],
             minSearchCharacters: 1,
@@ -147,6 +149,7 @@ fieldset {
         };
 
         new PatientSearchWidget(widgetConfig);
+
     });
 </script>
 
@@ -192,6 +195,8 @@ fieldset {
 
             </fieldset>
 
+            <br><br>
+
             <fieldset id="surgicalTeamFieldset" ${surgery.procedure.name ?: 'style="display:none"'}>
                 <legend>${ui.message("operationtheater.surgery.page.fieldset.surgicalTeam")}</legend>
 
@@ -224,42 +229,53 @@ fieldset {
 
         </form>
 
+        <div id="allergies"  ${surgery.procedure.name ?: 'style="display:none"'}>
 
-        <h3>Allergies</h3>
+            <h3>Allergies</h3>
 
-        <% if (allergies.size() > 0) { %>
+            <% if (allergies.size() > 0) { %>
 
-        <table id="allergies-table">
-            <thead>
-            <th>Allergen</th>
-            <th>Reactions</th>
-            </thead>
-            <% allergies.each { allergy -> %>
-            <tr>
-                <td>
-                    ${ allergy.getAllergen().toString() }
-                </td>
-                <td>
-                    <% allergy.getReactions().each { reaction -> %>
+            <table id="allergies-table">
+                <thead>
+                <th>Allergen</th>
+                <th>Reactions</th>
+                </thead>
+                <% allergies.each { allergy -> %>
+                <tr>
+                    <td>
+                        ${ allergy.getAllergen().toString() }
+                    </td>
+                    <td>
+                        <% if (allergy.getReactions().size() > 1) { %>
+                        <% for (int i=0; i < allergy.getReactions().size()-1; i++) { %>
+                        ${ allergy.getReactions()[i] },
+                        <% } %>
+                        ${ allergy.getReactions()[allergy.getReactions().size()-1]}
+                        <% } else { %>
+                        <%   allergy.getReactions().each { reaction -> %>
 
-                    ${ reaction.toString()},
-                    <% } %>
-                </td>
-            </tr>
+                        ${ reaction.toString()}
+                        <% } %>
+                        <% } %>
+                    </td>
+                </tr>
+                <% } %>
+
+                <tbody>
+
+                </tbody>
+            </table>
+
+            <%  } else { %>
+            <p>There are no allergies.</p>
             <% } %>
 
-            <tbody>
-
-            </tbody>
-        </table>
-
-        <%  } else { %>
-        <p>There are no allergies</p>
-        <% } %>
-
+        </div>
 
     </div>
 
+
+    <% if (surgery.procedure.name) { %>
 
     <!- Right hand column -!>
 
@@ -276,7 +292,7 @@ fieldset {
 
 
                     <li class="float-left">
-                        <a href="/openmrs/operationtheater/patientsSurgeries.page?patientId=8&amp;returnUrl=%2Fopenmrs%2Fcoreapps%2Fclinicianfacing%2Fpatient.page%3FpatientId%3D8%26" id="operationtheater.patientsSurgeriesPatientDashboardLink" class="float-left">
+                        <a href="/openmrs/operationtheater/patientsSurgeries.page?patientId=${patient.id}" id="operationtheater.patientsSurgeriesPatientDashboardLink" class="float-left">
                             <i class="icon-folder-open float-left"></i>
                             Open Surgeries
                         </a>
@@ -286,46 +302,62 @@ fieldset {
 
 
                     <li>
-                        <a id="startSurgeryButton">
-                            <svg class="icon-custom" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 35 35">
-                                <path d="M16 0c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16-7.2-16-16-16zM16 29c-7.2 0-13-5.8-13-13s5.8-13 13-13 13 5.8 13 13-5.8 13-13 13zM12 9l12 7-12 7z"/>
-                            </svg>
-                            ${ui.message("operationtheater.surgery.page.button.beginSurgery")}
+                        <a href="/openmrs/operationtheater/pretheaterData.page?patient=${patient.id}&surgeryId=${surgery.id}">
+                            <i class="icon-plus float-left"></i>
+                            Add pre-theater data
                         </a>
                     </li>
 
 
                     <li>
-                        <svg class="icon-custom" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 35 35">
-                            <path d="M16 0c-8.837 0-16 7.163-16 16s7.163 16 16 16 16-7.163 16-16-7.163-16-16-16zM16 29c-7.18 0-13-5.82-13-13s5.82-13 13-13 13 5.82 13 13-5.82 13-13 13zM10 10h12v12h-12z"></path>
-                        </svg>
-                        <a id="finishSurgeryButton">${ui.message("operationtheater.surgery.page.button.finishSurgery")}</a>
+                        <a href="/openmrs/operationtheater/postTheaterData.page?patient=${patient.id}&surgeryId=${surgery.id}">
+                            <i class="icon-plus float-left"></i>
+                            Add post-theater data
+                        </a>
+                    </li>
+
+                </ul>
+
+                <ul style="-webkit-margin-start: 30px">
+
+
+                    <li style="list-style-type: circle">
+                        <a id="startSurgeryButton">
+                            ${ui.message("operationtheater.surgery.page.button.beginSurgery")}
+                        </a>
                     </li>
 
 
-
-                    <h3>Workflow</h3>
-
-                    <table id="timestamp-table">
-                        <thead>
-                        <tr>
-                            <th>${ui.message("operationtheater.surgery.page.tableColumn.event")}</th>
-                            <th>${ui.message("operationtheater.surgery.page.tableColumn.date")}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-
-                        </tbody>
-                    </table>
-
-
-
+                    <li style="list-style-type: disc">
+                        <a id="finishSurgeryButton">${ui.message("operationtheater.surgery.page.button.finishSurgery")}</a>
+                    </li>
 
                 </ul>
+
+                <h3>Workflow</h3>
+
+                <table id="timestamp-table">
+                    <thead>
+                    <tr>
+                        <th>${ui.message("operationtheater.surgery.page.tableColumn.event")}</th>
+                        <th>${ui.message("operationtheater.surgery.page.tableColumn.date")}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+
+
+
+
+
 
             </div>
         </fieldset>
 
     </div>
+
+    <% } %>
 
 </div>
