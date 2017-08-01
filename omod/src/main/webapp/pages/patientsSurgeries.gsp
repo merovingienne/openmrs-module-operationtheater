@@ -7,8 +7,6 @@ ${ui.includeFragment("coreapps", "patientHeader", [patient: patient.patient, act
 
 <script type="text/javascript">
 
-    // TODO redo usnig angular?
-
     var breadcrumbs = [
         { icon: "icon-home", link: '/' + OPENMRS_CONTEXT_PATH + '/index.htm' },
         { label: "${ patient.patient.familyName }, ${ patient.patient.givenName }", link: '${ui.pageLink("coreapps", "clinicianfacing/patient", [patientId: patient.id])}'},
@@ -78,10 +76,10 @@ ${ui.includeFragment("coreapps", "patientHeader", [patient: patient.patient, act
             <tbody>
             <% surgeryList.each { surgery -> %>
 
-            <tr onclick=viewSurgery('${surgery.id}','${surgery.patient.id}') style="cursor: pointer">
-                <td>${ui.format(surgery.dateCreated)}</td>
-                <td>${ui.format(surgery.procedure.name)}</td>
-                <td>${ui.format(surgery.procedure.description)}</td>
+            <tr >
+                <td onclick=viewSurgery('${surgery.id}','${surgery.patient.id}') style="cursor: pointer">${ui.format(surgery.dateCreated)}</td>
+                <td onclick=viewSurgery('${surgery.id}','${surgery.patient.id}') style="cursor: pointer">${ui.format(surgery.procedure.name)}</td>
+                <td onclick=viewSurgery('${surgery.id}','${surgery.patient.id}') style="cursor: pointer">${ui.format(surgery.procedure.description)}</td>
                 <td class="align-center">
                     <span>
                         <i class="editElement delete-item icon-pencil"

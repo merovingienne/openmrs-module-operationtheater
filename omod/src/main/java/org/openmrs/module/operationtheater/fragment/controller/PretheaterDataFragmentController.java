@@ -46,7 +46,7 @@ public class PretheaterDataFragmentController {
      * @param UI
      * @param patient required
      * @return JSON objects with past procedure data.
-     * @see omod/src/main/webapp/resources/scripts/preTheaterForm_page/pastProcedures.js
+     * @see omod/src/main/webapp/resources/scripts/preTheaterForm_page/surgeryNote.js
      */
 
     public List<SimpleObject> getPastProcedures(UiUtils UI,
@@ -156,6 +156,157 @@ public class PretheaterDataFragmentController {
         return new SuccessResult(ui.message("operationtheater.pastProcedure.successfullyAdded"));
 
     }
-    
+
+
+    /**
+     * Return all pre-theater drugs prescribed for this surgery.
+     * @param UI
+     * @param surgery
+     * @return JSON objects of pre-theater drugs.
+     */
+
+
+    public List<SimpleObject> getPreTheaterDrugs(UiUtils UI, @RequestParam("surgery") Surgery surgery){
+
+        if (surgery == null){
+            throw new IllegalArgumentException("Surgery doesn't exist");
+        }
+
+        List<Drug> drugList = Drug.getAllDrugs(surgery, 1);
+
+        if (drugList == null){
+            drugList = Collections.emptyList();
+            List<SimpleObject> emptyList = Collections.emptyList();
+            return emptyList;
+        }
+
+
+        return SimpleObject.fromCollection(drugList, UI,"name", "quantity", "notes"  );
+
+    }
+
+
+    /**
+     * Add new pre-theater drug prescription as obs.
+     * @param ui
+     * @param patient
+     * @param surgery
+     * @param drugConceptId
+     * @param drugQuantity
+     * @param prescriptionNotes
+     * @param otService
+     * @return
+     */
+
+
+    public FragmentActionResult addPretheaterDrugPrescription(UiUtils ui,
+                                                              @RequestParam("patient")  Patient patient,
+                                                              @RequestParam("surgery") Surgery surgery,
+                                                              @RequestParam("drugConceptId") String drugConceptId,
+                                                              @RequestParam("drugQuantity") String drugQuantity,
+                                                              @RequestParam("prescriptionNotes") String prescriptionNotes,
+                                                              @SpringBean OperationTheaterService otService)
+    {
+
+
+        if (patient == null){
+            return new FailureResult(ui.message("operationtheater.patient.notFound"));
+        }
+
+        if (drugConceptId == null || drugConceptId.length() == 0){
+            return new FailureResult(ui.message("Drug not found."));
+        }
+
+        if (drugQuantity == null || drugQuantity.length() == 0){
+            return new FailureResult(ui.message("Invalid drug quantity"));
+        }
+
+
+        ConceptService conceptService = Context.getConceptService();
+        ObsService obsService = Context.getObsService();
+
+
+        Concept drug = conceptService.getConcept(Integer.parseInt(drugConceptId));
+
+        Obs surgeryInfoObs = SurgeryObsUtil.getSurgeryObs(surgery, patient);
+
+        Obs preTheaterDrug = new Obs();
+        preTheaterDrug.setConcept(drug);
+        preTheaterDrug.setPerson(patient);
+        preTheaterDrug.setObsDatetime(new Date());
+        preTheaterDrug.setValueNumeric(Double.parseDouble(drugQuantity));
+        preTheaterDrug.setLocation(new Location(1));
+        preTheaterDrug.setComment(prescriptionNotes);
+
+
+        boolean hasPreTheaterParent = false;
+        Obs preTheaterDrugsObsGroup = null;
+
+
+
+        if (surgeryInfoObs.hasGroupMembers()){
+
+            Set<Obs> memberObs = surgeryInfoObs.getGroupMembers();
+
+            for (Obs ob: memberObs){
+                if (ob.getConcept().getConceptId() == 200002){
+                    preTheaterDrugsObsGroup = ob;
+                    hasPreTheaterParent = true;
+                }
+            }
+
+            if (!hasPreTheaterParent){
+                preTheaterDrugsObsGroup = createPretheaterDrugsParentObs(patient);
+            }
+
+        } else {
+            preTheaterDrugsObsGroup = createPretheaterDrugsParentObs(patient);
+
+        }
+
+        preTheaterDrugsObsGroup.addGroupMember(preTheaterDrug);
+
+        if (!hasPreTheaterParent){
+            surgeryInfoObs.addGroupMember(preTheaterDrugsObsGroup);
+        }
+
+
+        try {
+            obsService.saveObs(surgeryInfoObs, "added pre-theater drug");
+            surgery.setSurgeryObsGroup(surgeryInfoObs);
+            otService.saveSurgery(surgery);
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            return new FailureResult(ui.message("Failed to add drug prescription"));
+        }
+
+
+        log.info("Pre-theater prescription successfully added.");
+
+        return new SuccessResult(ui.message("Drug prescription successfully added."));
+    }
+
+
+    /**
+     * Create pre-theater drugs obs group if null.
+     * @param patient
+     * @return
+     */
+
+
+    public Obs createPretheaterDrugsParentObs(Patient patient){
+
+
+        log.warn("Doesn't have pre-theater drugs parent.");
+
+        Obs preTheaterDrugsObsGroup = new Obs();
+        preTheaterDrugsObsGroup.setConcept(Context.getConceptService().getConcept(200002));
+        preTheaterDrugsObsGroup.setPerson(patient);
+        preTheaterDrugsObsGroup.setObsDatetime(new Date());
+        preTheaterDrugsObsGroup.setLocation(new Location(1));
+
+        return  preTheaterDrugsObsGroup;
+
+    }
 
 }

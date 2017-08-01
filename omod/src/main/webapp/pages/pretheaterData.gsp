@@ -1,5 +1,6 @@
 <%
     ui.decorateWith('appui', 'standardEmrPage')
+    ui.includeJavascript("operationtheater", "preTheaterForm_page/drugs.js")
     ui.includeJavascript("operationtheater", "preTheaterForm_page/pastProcedures.js")
     ui.includeJavascript("uicommons", "typeahead.js");
 
@@ -69,6 +70,17 @@ fieldset {
         var procedureOptions = { source: Object.keys(procedureMap) };
         jq('#pastProcedureName').typeahead(procedureOptions);
 
+
+        var drugMap = {};
+        <% drugList.each{ drug ->%>
+        drugMap['${drug.getName()}'] = '${drug.getId()}';
+        <% } %>
+        var drugOptions = { source: Object.keys(drugMap) };
+        jq('#preTheaterDrug-field').typeahead(drugOptions);
+
+
+
+        preTheaterDrugs.init(${surgery.id}, ${patient.id}, drugMap);
         pastProcedures.init(${surgery.id}, ${patient.id});
 
 
@@ -206,3 +218,32 @@ ${ ui.includeFragment('operationtheater', 'surgeryHeader', [
     </div>
 </fieldset>
 
+<fieldset class="section-container" id="patient_history">
+    <legend style="padding: 5px 5px 0px 5px">Fitness for Surgery</legend>
+    <div class="section">
+        <div class="section-item">
+            <h3>Physical condition</h3>
+            <p>Enter conditions that may be of concern for the procedure.</p>
+            ${ ui.includeFragment('operationtheater', 'field/textarea', [
+                    placeholder        : "Physical Condition",
+                    formFieldName: "physicalCondition",
+                    id           : "physicalCondition",
+                    rows         : 3
+            ]) }
+        </div>
+    </div>
+</fieldset>
+
+<fieldset class="section-container" id="patient_history">
+    <legend style="padding: 5px 5px 0px 5px">Pre-procedure tasks</legend>
+    <div class="section">
+        <div class="section-item">
+
+            ${ ui.includeFragment('operationtheater', 'preTheaterDrugs',[
+                    includeForm: true
+            ])}
+
+
+        </div>
+    </div>
+</fieldset>
