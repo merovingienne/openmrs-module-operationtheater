@@ -1,15 +1,12 @@
 package org.openmrs.module.operationtheater;
 
-import org.openmrs.Patient;
-import org.openmrs.Provider;
+import org.openmrs.*;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
 
-import org.openmrs.module.operationtheater.attribute.converter.time.LocalDateAttributeConverter;
 import org.openmrs.module.operationtheater.attribute.converter.time.LocalDateTimeAttributeConverter;
 
 /**
@@ -49,6 +46,13 @@ public class Surgery extends BaseOpenmrsDataJPA {
 			joinColumns = { @JoinColumn(name = "surgery_id", nullable = false, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "provider_id", nullable = false, updatable = false) })
 	private Set<Provider> surgicalTeam;
+
+
+	@OneToOne(cascade = { CascadeType.ALL })
+	@JoinTable(name = "surgery_info_obs",
+				joinColumns = { @JoinColumn(name="surgery_id", referencedColumnName = "surgery_id", nullable = true, updatable = true) },
+				inverseJoinColumns = { @JoinColumn(name = "obs_group_id", referencedColumnName = "obs_id", nullable = true, updatable = true) })
+	private Obs SurgeryObsGroup;
 
 	public int getSurgeryId() {
 		return surgeryId;
@@ -104,6 +108,14 @@ public class Surgery extends BaseOpenmrsDataJPA {
 		this.surgicalTeam = surgicalTeam;
 	}
 
+	public Obs getSurgeryObsGroup() {
+		return SurgeryObsGroup;
+	}
+
+	public void setSurgeryObsGroup(Obs surgeryObsGroup) {
+		SurgeryObsGroup = surgeryObsGroup;
+	}
+
 	public LocalDateTime getDateFinished() {
 		return dateFinished;
 	}
@@ -119,4 +131,8 @@ public class Surgery extends BaseOpenmrsDataJPA {
 	public void setDateStarted(LocalDateTime dateStarted) {
 		this.dateStarted = dateStarted;
 	}
+
+
+
+
 }

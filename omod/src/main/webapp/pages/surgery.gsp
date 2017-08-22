@@ -4,6 +4,9 @@
     ui.includeJavascript("operationtheater", "surgery_page/surgery.js")
     ui.includeJavascript("operationtheater", "surgery_page/surgicalTeam.js")
     ui.includeJavascript("operationtheater", "surgery_page/workflow.js")
+    ui.includeJavascript("operationtheater", "preTheaterForm_page/pastProcedures.js")
+    ui.includeJavascript("operationtheater", "preTheaterForm_page/drugs.js")
+    ui.includeJavascript("operationtheater", "postTheaterForm_page/drugs.js")
 
     ui.includeJavascript("uicommons", "emr.js")
     ui.includeJavascript("uicommons", "typeahead.js");
@@ -150,6 +153,21 @@ fieldset {
 
         new PatientSearchWidget(widgetConfig);
 
+
+        <% if (surgery.procedure.name) { %>
+        // Past procedures
+        pastProcedures.init(${surgery.id}, ${patient.id});
+
+        // pre-theater drugs
+        preTheaterDrugs.init(${surgery.id}, ${patient.id}, null);
+
+        // in and post theater drugs
+        postTheaterDrugs.init(${surgery.id}, ${patient.id}, null);
+
+        // surgery notes
+        surgeryNote.init(${surgery.id}, ${patient.id});
+
+        <% } %>
     });
 </script>
 
@@ -229,6 +247,28 @@ fieldset {
 
         </form>
 
+        <br>
+
+
+        <div id="past-procedures" ${surgery.procedure.name ?: 'style="display:none"'}>
+            <h3>Past Procedures</h3>
+
+            <table id="past-procedures-table">
+                <thead>
+                <tr>
+                    <th style="width: 20%">${ui.message("Procedure")}</th>
+                    <th style="width: 20%">${ui.message("Date")}</th>
+                    <th style="width: 20%">${ui.message("Comment")}</th>
+                </tr>
+                </thead>
+                <tbody id="past-procedures-table-body">
+
+                </tbody>
+            </table>
+        </div>
+
+        <br>
+
         <div id="allergies"  ${surgery.procedure.name ?: 'style="display:none"'}>
 
             <h3>Allergies</h3>
@@ -271,6 +311,25 @@ fieldset {
             <% } %>
 
         </div>
+
+
+
+        <% if (surgery.procedure.name) { %>
+        <br>
+        ${ ui.includeFragment("operationtheater", "preTheaterDrugs", [
+                includeForm: false
+        ])}
+        <br>
+        ${ ui.includeFragment('operationtheater', 'inTheaterDrugs',[
+                includeForm: false,
+        ])}
+        <br>
+        ${ ui.includeFragment('operationtheater', 'postTheaterDrugs',[
+                includeForm: false,
+        ])}
+        <% } %>
+
+
 
     </div>
 

@@ -326,4 +326,36 @@
                                  referencedTableName="provider" referencedColumnNames="provider_id"/>
     </changeSet>
 
+
+    <changeSet author="Chanuka Wijayakoon" id="operationtheater-201708061052">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="surgery_info_obs"/>
+            </not>
+        </preConditions>
+        <comment>
+            Create the surgical_info_obs table
+        </comment>
+        <createTable tableName="surgery_info_obs">
+
+            <column name="surgery_info_obs_id" type="integer" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="surgery_id" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="obs_group_id" type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="surgery_info_surgery_id"
+                                 baseTableName="surgery_info_obs" baseColumnNames="surgery_id"
+                                 referencedTableName="surgery" referencedColumnNames="surgery_id"/>
+
+        <addForeignKeyConstraint constraintName="surgery_info_obs_group_id"
+                                 baseTableName="surgery_info_obs" baseColumnNames="obs_group_id"
+                                 referencedTableName="obs" referencedColumnNames="obs_id"/>
+    </changeSet>
+
 </databaseChangeLog>
