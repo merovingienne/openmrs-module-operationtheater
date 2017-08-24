@@ -19,11 +19,11 @@ import org.apache.commons.logging.LogFactory;
 //import org.joda.time.Interval;
 //import org.joda.time.LocalTime;
 //import org.joda.time.format.DateTimeFormatter;
-import org.openmrs.Location;
-import org.openmrs.LocationAttribute;
-import org.openmrs.Patient;
+import org.openmrs.*;
 import org.openmrs.api.APIException;
+import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appointmentscheduling.AppointmentBlock;
 import org.openmrs.module.appointmentscheduling.api.AppointmentService;
@@ -42,6 +42,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.threeten.extra.Interval;
 
@@ -178,6 +179,18 @@ public class OperationTheaterServiceImpl extends BaseOpenmrsService implements O
 	@Override
 	public Procedure saveProcedure(Procedure procedure) throws APIException {
 		ValidateUtil.validate(procedure);
+
+		ConceptService cs = Context.getConceptService();
+
+		if (cs.getConcept(procedure.getName()) == null){
+			log.info("Creating new concept from procedure.");
+			Concept c = new Concept();
+			c.setConceptClass(cs.getConceptClassByName("Procedure"));
+			c.setDatatype(cs.getConceptDatatypeByName("N/A"));
+			c.setFullySpecifiedName(new ConceptName(procedure.getName(), Locale.ENGLISH));
+			cs.saveConcept(c);
+		}
+
 		return procedureDAO.saveOrUpdate(procedure);
 	}
 

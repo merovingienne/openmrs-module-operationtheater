@@ -115,7 +115,7 @@ public interface OperationTheaterService extends OpenmrsService {
 	public Procedure getProcedure(Integer id);
 
 	/**
-	 * Creates or updates the given surgery in the database.
+	 * Creates or updates the given procedure in the database.
 	 *
 	 * @param procedure procedure to be created
 	 * @return created or updated procedure
