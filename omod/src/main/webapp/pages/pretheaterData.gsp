@@ -218,21 +218,6 @@ ${ ui.includeFragment('operationtheater', 'surgeryHeader', [
     </div>
 </fieldset>
 
-<fieldset class="section-container" id="patient_history">
-    <legend style="padding: 5px 5px 0px 5px">Fitness for Surgery</legend>
-    <div class="section">
-        <div class="section-item">
-            <h3>Physical condition</h3>
-            <p>Enter conditions that may be of concern for the procedure.</p>
-            ${ ui.includeFragment('operationtheater', 'field/textarea', [
-                    placeholder        : "Physical Condition",
-                    formFieldName: "physicalCondition",
-                    id           : "physicalCondition",
-                    rows         : 3
-            ]) }
-        </div>
-    </div>
-</fieldset>
 
 <fieldset class="section-container" id="patient_history">
     <legend style="padding: 5px 5px 0px 5px">Pre-procedure tasks</legend>
