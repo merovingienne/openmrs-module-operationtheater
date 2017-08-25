@@ -2,7 +2,6 @@ package org.openmrs.module.operationtheater.validator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-//import org.joda.time.DateTime;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.operationtheater.SchedulingData;

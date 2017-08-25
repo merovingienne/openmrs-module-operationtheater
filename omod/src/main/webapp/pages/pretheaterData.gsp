@@ -163,7 +163,7 @@ ${ ui.includeFragment('operationtheater', 'surgeryHeader', [
                 </form>
                 <a class="button"
                    id="addPastProcedureButton"
-                   onclick=surgeryNote.add()>${ui.message("general.add")}</a>
+                   onclick=pastProcedures.add()>${ui.message("general.add")}</a>
             </div>
             <br>
         </div>

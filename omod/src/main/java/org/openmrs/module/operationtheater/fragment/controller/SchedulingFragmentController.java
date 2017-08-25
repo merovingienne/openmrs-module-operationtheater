@@ -2,11 +2,6 @@ package org.openmrs.module.operationtheater.fragment.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-//import org.joda.time.DateTime;
-//import org.joda.time.LocalTime;
-//import org.joda.time.Minutes;
-//import org.joda.time.format.DateTimeFormatter;
-//import org.joda.time.LocalDateTime;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationTag;

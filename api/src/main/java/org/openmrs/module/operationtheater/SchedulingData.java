@@ -3,7 +3,6 @@ package org.openmrs.module.operationtheater;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.annotations.Type;
-//import org.joda.time.DateTime;
 import org.openmrs.Location;
 import org.openmrs.module.operationtheater.attribute.converter.time.LocalDateTimeAttributeConverter;
 

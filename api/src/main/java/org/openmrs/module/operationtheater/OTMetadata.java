@@ -1,8 +1,5 @@
 package org.openmrs.module.operationtheater;
 
-//import org.joda.time.format.DateTimeFormat;
-//import org.joda.time.format.DateTimeFormatter;
-
 import java.time.format.DateTimeFormatter;
 
 public class OTMetadata {

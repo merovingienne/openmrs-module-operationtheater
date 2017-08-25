@@ -1,6 +1,5 @@
 package org.openmrs.module.operationtheater.api.db;
 
-//import org.joda.time.DateTime;
 import org.openmrs.Patient;
 import org.openmrs.module.operationtheater.Surgery;
 

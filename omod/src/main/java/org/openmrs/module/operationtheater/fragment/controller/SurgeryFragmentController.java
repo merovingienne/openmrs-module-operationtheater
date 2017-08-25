@@ -1,6 +1,5 @@
 package org.openmrs.module.operationtheater.fragment.controller;
 
-//import org.joda.time.DateTime;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.api.ProviderService;

@@ -13,8 +13,6 @@
  */
 package org.openmrs.module.operationtheater.api;
 
-//import org.joda.time.DateTime;
-//import org.joda.time.Interval;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.api.APIException;

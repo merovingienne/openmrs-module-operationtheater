@@ -2,9 +2,6 @@ package org.openmrs.module.operationtheater.scheduler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-//import org.joda.time.DateTime;
-//import org.joda.time.Interval;
-//import org.joda.time.Minutes;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
 import org.openmrs.api.LocationService;

@@ -15,7 +15,6 @@ package org.openmrs.module.operationtheater;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-//import org.joda.time.DateTime;
 import org.openmrs.*;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.LocationService;

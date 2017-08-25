@@ -29,7 +29,7 @@
         emr.getFragmentActionWithCallback("operationtheater", "postTheaterData", "getSurgeryNote", { surgery: surgery}
             , function (data) {
 
-                if (data.message != null){
+                if (data.comment != null){
 
                     surgeryNoteTable.empty();
 

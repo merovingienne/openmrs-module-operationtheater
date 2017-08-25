@@ -3,7 +3,6 @@ package org.openmrs.module.operationtheater.api.db;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.DbSetupTracker;
 import com.ninja_squad.dbsetup.operation.Operation;
-//import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Patient;

@@ -2,10 +2,6 @@ package org.openmrs.module.operationtheater.scheduler.domain;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-//import org.joda.time.DateTime;
-//import org.joda.time.Interval;
-//import org.joda.time.format.DateTimeFormat;
-//import org.joda.time.format.DateTimeFormatter;
 import org.openmrs.Location;
 import org.openmrs.module.operationtheater.Procedure;
 import org.openmrs.module.operationtheater.SchedulingData;

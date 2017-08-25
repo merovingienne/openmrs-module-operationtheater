@@ -1,7 +1,5 @@
 package org.openmrs.module.operationtheater.scheduler.solver;
 
-//import org.joda.time.DateTime;
-
 import java.time.ZonedDateTime;
 import java.util.Comparator;
 

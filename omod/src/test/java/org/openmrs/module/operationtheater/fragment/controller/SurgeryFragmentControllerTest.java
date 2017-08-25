@@ -1,6 +1,5 @@
 package org.openmrs.module.operationtheater.fragment.controller;
 
-//import org.joda.time.DateTime;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;

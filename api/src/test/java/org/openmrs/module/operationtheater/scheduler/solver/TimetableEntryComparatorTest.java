@@ -1,6 +1,5 @@
 package org.openmrs.module.operationtheater.scheduler.solver;
 
-//import org.joda.time.DateTime;
 import org.junit.Test;
 import org.openmrs.Location;
 import org.openmrs.module.operationtheater.SchedulingData;

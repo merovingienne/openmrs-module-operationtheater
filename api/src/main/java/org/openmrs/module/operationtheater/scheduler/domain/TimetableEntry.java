@@ -1,6 +1,5 @@
 package org.openmrs.module.operationtheater.scheduler.domain;
 
-//import org.joda.time.DateTime;
 import org.openmrs.Location;
 import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
 

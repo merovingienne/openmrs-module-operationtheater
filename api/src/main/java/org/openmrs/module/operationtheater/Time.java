@@ -1,7 +1,5 @@
 package org.openmrs.module.operationtheater;
 
-//import org.joda.time.DateTime;
-
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 

@@ -1,7 +1,5 @@
 package org.openmrs.module.operationtheater.scheduler.domain;
 
-//import org.joda.time.DateTime;
-//import org.joda.time.Interval;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;

@@ -17,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-//import org.joda.time.DateTime;
 import org.openmrs.Patient;
 import org.openmrs.module.operationtheater.Surgery;
 import org.openmrs.module.operationtheater.api.db.OperationTheaterDAO;
