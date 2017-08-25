@@ -97,11 +97,21 @@ public class PostTheaterDataFragmentController {
             return new FailureResult(ui.message("Wrong surgery workflow position."));
         }
 
+        if (drugConceptId == null || drugConceptId.length() == 0 || drugConceptId == "undefined"){
+            return new FailureResult(ui.message("Invalid drug."));
+        }
+
         ConceptService conceptService = Context.getConceptService();
         ObsService obsService = Context.getObsService();
 
+        Concept drug = null;
 
-        Concept drug = conceptService.getConcept(Integer.parseInt(drugConceptId));
+
+        try {
+            drug = conceptService.getConcept(Integer.parseInt(drugConceptId));
+        } catch (NumberFormatException e) {
+            return new FailureResult(ui.message("Invalid drug."));
+        }
 
         Obs surgeryInfoObs = SurgeryObsUtil.getSurgeryObs(surgery, patient);
 

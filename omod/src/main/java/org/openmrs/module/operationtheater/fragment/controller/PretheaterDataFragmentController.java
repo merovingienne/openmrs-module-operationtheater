@@ -213,8 +213,8 @@ public class PretheaterDataFragmentController {
             return new FailureResult(ui.message("operationtheater.patient.notFound"));
         }
 
-        if (drugConceptId == null || drugConceptId.length() == 0){
-            return new FailureResult(ui.message("Drug not found."));
+        if (drugConceptId == null || drugConceptId.length() == 0 || drugConceptId == "undefined"){
+            return new FailureResult(ui.message("Invalid drug."));
         }
 
         if (drugQuantity == null || drugQuantity.length() == 0){
@@ -226,7 +226,13 @@ public class PretheaterDataFragmentController {
         ObsService obsService = Context.getObsService();
 
 
-        Concept drug = conceptService.getConcept(Integer.parseInt(drugConceptId));
+        Concept drug = null;
+
+        try {
+            drug = conceptService.getConcept(Integer.parseInt(drugConceptId));
+        } catch (NumberFormatException e) {
+            return new FailureResult(ui.message("Invalid drug."));
+        }
 
         Obs surgeryInfoObs = SurgeryObsUtil.getSurgeryObs(surgery, patient);
 

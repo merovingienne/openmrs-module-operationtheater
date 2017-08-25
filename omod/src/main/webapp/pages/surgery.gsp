@@ -7,6 +7,7 @@
     ui.includeJavascript("operationtheater", "preTheaterForm_page/pastProcedures.js")
     ui.includeJavascript("operationtheater", "preTheaterForm_page/drugs.js")
     ui.includeJavascript("operationtheater", "postTheaterForm_page/drugs.js")
+    ui.includeJavascript("operationtheater", "postTheaterForm_page/surgeryNote.js")
 
     ui.includeJavascript("uicommons", "emr.js")
     ui.includeJavascript("uicommons", "typeahead.js");
@@ -327,6 +328,22 @@ fieldset {
         ${ ui.includeFragment('operationtheater', 'postTheaterDrugs',[
                 includeForm: false,
         ])}
+
+        <br>
+        <div class="section-item">
+            <h3>Surgery notes</h3>
+            <div id="surgery-note-div">
+                <table id="surgery-note-table" style="margin: 10px 0px">
+                    <tbody id="surgery-note-table-body">
+
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+
+
         <% } %>
 
 
