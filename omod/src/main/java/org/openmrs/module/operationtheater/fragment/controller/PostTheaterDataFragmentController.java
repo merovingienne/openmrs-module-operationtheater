@@ -51,7 +51,24 @@ public class PostTheaterDataFragmentController {
             throw new IllegalArgumentException("Surgery doesn't exist");
         }
 
-        List<Drug> drugList = Drug.getAllDrugs(surgery, Integer.parseInt(workflowPos));
+        if (workflowPos == null || workflowPos.length() == 0){
+            throw new IllegalArgumentException("Invalid workflow stage");
+        }
+
+        int workflowPosition;
+
+        try {
+            workflowPosition = Integer.parseInt(workflowPos);
+
+            if (workflowPosition != 2 && workflowPosition != 3){
+                throw new IllegalArgumentException("Invalid workflow stage");
+            }
+
+        } catch (NumberFormatException e){
+            throw new IllegalArgumentException("Invalid workflow stage");
+        }
+
+        List<Drug> drugList = Drug.getAllDrugs(surgery, workflowPosition);
 
         if (drugList == null){
             drugList = Collections.emptyList();
@@ -93,12 +110,24 @@ public class PostTheaterDataFragmentController {
             return new FailureResult(ui.message("operationtheater.patient.notFound"));
         }
 
+        if (surgery == null){
+            return new FailureResult(ui.message("operationtheater.surgery.notFound"));
+        }
+
         if (!workflowPos.equalsIgnoreCase("2") && !workflowPos.equalsIgnoreCase("3")){
-            return new FailureResult(ui.message("Wrong surgery workflow position."));
+            return new FailureResult(ui.message("Invalid workflow position."));
         }
 
         if (drugConceptId == null || drugConceptId.length() == 0 || drugConceptId == "undefined"){
-            return new FailureResult(ui.message("Invalid drug."));
+            return new FailureResult(ui.message("operationtheater.drug.invalidDrug"));
+        }
+
+        if (drugQuantity == null || drugQuantity.length() == 0){
+            return new FailureResult(ui.message("operationtheater.drug.invalidQuantity"));
+        }
+
+        if (prescriptionNotes == null || prescriptionNotes.length() == 0){
+            return new FailureResult(ui.message("operationtheater.drug.invalidNote"));
         }
 
         ConceptService conceptService = Context.getConceptService();
@@ -180,6 +209,19 @@ public class PostTheaterDataFragmentController {
                                                        @SpringBean OperationTheaterService otService
     )
     {
+
+        if (patient == null){
+            throw new IllegalArgumentException("Patient not found");
+        }
+
+        if (surgery == null){
+            throw new IllegalArgumentException("Surgery not found");
+        }
+
+
+        if (surgeryNote == null || surgeryNote.length() == 0){
+            return new FailureResult("Invalid surgery note.");
+        }
 
         ConceptService conceptService = Context.getConceptService();
         ObsService obsService = Context.getObsService();
@@ -292,6 +334,12 @@ public class PostTheaterDataFragmentController {
 
     public SimpleObject getSurgeryNote(UiUtils UI,
                                        @RequestParam("surgery") Surgery surgery){
+
+
+        if (surgery == null){
+            throw new IllegalArgumentException("Surgery does not exist");
+        }
+
         ObsService obsService = Context.getObsService();
 
         Obs procedureObs = surgery.getSurgeryObsGroup();
@@ -319,7 +367,7 @@ public class PostTheaterDataFragmentController {
 
 
     /**
-     *
+     * Helper Method
      * @param patient
      * @param conceptId
      * @return

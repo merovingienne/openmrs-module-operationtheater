@@ -132,7 +132,7 @@ ${ ui.includeFragment('operationtheater', 'surgeryHeader', [
                     padding: 100px 0px;">
                         <tr style="border: none; background-color: #F2F2F2">
                             <td style="border: none; min-width: 60px;">
-                                Procedure name
+                                Procedure name<span style="color: red;">*</span>
                             </td>
                             <td style="border: none; min-width: 100px">
                                 <input type="text" id="pastProcedureName">
@@ -140,7 +140,7 @@ ${ ui.includeFragment('operationtheater', 'surgeryHeader', [
                         </tr>
                         <tr style="border: none; background-color: #F2F2F2">
                             <td style="border: none; min-width: 60px;">
-                                Procedure date
+                                Procedure date<span style="color: red;">*</span>
                             </td>
                             <td style="border: none; min-width: 100px;">
                                 ${ ui.includeFragment('uicommons', 'field/datetimepicker', [
@@ -153,7 +153,7 @@ ${ ui.includeFragment('operationtheater', 'surgeryHeader', [
                         </tr>
                         <tr style="border: none; background-color: #F2F2F2">
                             <td style="border: none; min-width: 60px;">
-                                Procedure comment
+                                Procedure comment<span style="color: red;">*</span>
                             </td>
                             <td style="border: none; min-width: 100px">
                                 <textarea rows="3" id="pastProcedureComment" placeholder="Comments, diagnosis etc."></textarea>

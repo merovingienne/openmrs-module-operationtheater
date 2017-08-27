@@ -43,7 +43,7 @@
         padding: 100px 0px;">
             <tr style="border: none; background-color: #F2F2F2">
                 <td style="border: none; min-width: 60px;">
-                    Name
+                    Name<span style="color: red;">*</span>
                 </td>
                 <td style="border: none; min-width: 100px">
                     ${ui.includeFragment("uicommons", "field/text", [
@@ -57,21 +57,15 @@
             </tr>
             <tr style="border: none; background-color: #F2F2F2">
                 <td style="border: none; min-width: 60px;">
-                    Quantity
+                    Quantity<span style="color: red;">*</span>
                 </td>
                 <td style="border: none; min-width: 100px;">
-                    ${ ui.includeFragment('uicommons', 'field/text', [
-                            label: '',
-                            formFieldName: "preTheaterDrugQuantity",
-                            id           : "preTheaterDrugQuantity",
-                            maxLength    : 50,
-                            initialValue : ''
-                    ]) }
+                    <input type="number" id="preTheaterDrugQuantity" name="inTheaterDrugQuantity" required>
                 </td>
             </tr>
             <tr style="border: none; background-color: #F2F2F2">
                 <td style="border: none; min-width: 60px;">
-                    Time & Notes
+                    Time & Notes<span style="color: red;">*</span>
                 </td>
                 <td style="border: none; min-width: 100px">
                     <textarea rows="3" id="preTheaterDrugNotes" placeholder="Time before surgery, additional notes etc."></textarea>
@@ -80,6 +74,7 @@
         </table>
     </form>
     <button style="margin: 10px 0px" id="addPreTheaterDrug">Add</button>
+    <p id="preTheaterDrugErrorMsg" style="display: none"></p>
 </div>
 
 <% } %>

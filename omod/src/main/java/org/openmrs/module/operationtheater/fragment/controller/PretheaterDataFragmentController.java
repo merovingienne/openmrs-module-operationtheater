@@ -92,6 +92,14 @@ public class PretheaterDataFragmentController {
             return new FailureResult(ui.message("operationtheater.pastProcedure.invalidName"));
         }
 
+        if (pastProcedureDate == null){
+            return new FailureResult(ui.message("operationtheater.pastProcedure.invalidDate"));
+        }
+
+        if (pastProcedureComment == null){
+            return new FailureResult(ui.message("operationtheater.pastProcedure.invalidComment"));
+        }
+
 
         ConceptService conceptService = Context.getConceptService();
         ObsService obsService = Context.getObsService();
@@ -213,12 +221,20 @@ public class PretheaterDataFragmentController {
             return new FailureResult(ui.message("operationtheater.patient.notFound"));
         }
 
+        if (surgery == null){
+            return new FailureResult(ui.message("operationtheater.surgery.notFound"));
+        }
+
         if (drugConceptId == null || drugConceptId.length() == 0 || drugConceptId == "undefined"){
-            return new FailureResult(ui.message("Invalid drug."));
+            return new FailureResult(ui.message("operationtheater.drug.invalidDrug"));
         }
 
         if (drugQuantity == null || drugQuantity.length() == 0){
-            return new FailureResult(ui.message("Invalid drug quantity"));
+            return new FailureResult(ui.message("operationtheater.drug.invalidQuantity"));
+        }
+
+        if (prescriptionNotes == null || prescriptionNotes.length() == 0){
+            return new FailureResult(ui.message("operationtheater.drug.invalidNote"));
         }
 
 
@@ -231,7 +247,7 @@ public class PretheaterDataFragmentController {
         try {
             drug = conceptService.getConcept(Integer.parseInt(drugConceptId));
         } catch (NumberFormatException e) {
-            return new FailureResult(ui.message("Invalid drug."));
+            return new FailureResult(ui.message("operationtheater.drug.invalidDrug"));
         }
 
         Obs surgeryInfoObs = SurgeryObsUtil.getSurgeryObs(surgery, patient);
@@ -283,17 +299,18 @@ public class PretheaterDataFragmentController {
             otService.saveSurgery(surgery);
         } catch (Exception e){
             System.out.println(e.getMessage());
-            return new FailureResult(ui.message("Failed to add drug prescription"));
+            return new FailureResult(ui.message("operationtheater.drug.failedToAdd"));
         }
 
 
         log.info("Pre-theater prescription successfully added.");
 
-        return new SuccessResult(ui.message("Drug prescription successfully added."));
+        return new SuccessResult(ui.message("operationtheater.drug.successfullyAdded"));
     }
 
 
     /**
+     * Helper method
      * Create pre-theater drugs obs group if null.
      * @param patient
      * @return

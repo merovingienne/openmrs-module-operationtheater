@@ -41,7 +41,7 @@
         padding: 100px 0px;">
             <tr style="border: none; background-color: #F2F2F2">
                 <td style="border: none; min-width: 60px;">
-                    Name
+                    Name<span style="color: red;">*</span>
                 </td>
                 <td style="border: none; min-width: 100px">
                     <input type="text" id="postTheaterDrugName" name="postTheaterDrugName" required>
@@ -49,7 +49,7 @@
             </tr>
             <tr style="border: none; background-color: #F2F2F2">
                 <td style="border: none; min-width: 60px;">
-                    Quantity
+                    Quantity<span style="color: red;">*</span>
                 </td>
                 <td style="border: none; min-width: 100px;">
                     <input type="number" id="postTheaterDrugQuantity" name="inTheaterDrugQuantity" required>
@@ -57,7 +57,7 @@
             </tr>
             <tr style="border: none; background-color: #F2F2F2">
                 <td style="border: none; min-width: 60px;">
-                    Time & Notes
+                    Time & Notes<span style="color: red;">*</span>
                 </td>
                 <td style="border: none; min-width: 100px">
                     <textarea rows="3" id="postTheaterDrugNotes" placeholder="Time after surgery, additional notes etc." required></textarea>
@@ -66,7 +66,7 @@
         </table>
     </form>
     <button style="margin: 10px 0px" id="addPostTheaterDrug">Add</button>
-    <p id="postTheaterErrorMsg" style="display: none"></p>
+    <p id="postTheaterDrugErrorMsg" style="display: none"></p>
 </div>
 
 <% } %>

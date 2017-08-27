@@ -41,7 +41,7 @@
         padding: 100px 0px;">
             <tr style="border: none; background-color: #F2F2F2">
                 <td style="border: none; min-width: 60px;">
-                    Name
+                    Name<span style="color: red;">*</span>
                 </td>
                 <td style="border: none; min-width: 100px">
                     <input type="text" id="inTheaterDrugName" name="inTheaterDrugName" required autocomplete="off">
@@ -49,7 +49,7 @@
             </tr>
             <tr style="border: none; background-color: #F2F2F2">
                 <td style="border: none; min-width: 60px;">
-                    Quantity
+                    Quantity<span style="color: red;">*</span>
                 </td>
                 <td style="border: none; min-width: 100px;">
                     <input type="number" id="inTheaterDrugQuantity" name="inTheaterDrugQuantity" required>
@@ -57,7 +57,7 @@
             </tr>
             <tr style="border: none; background-color: #F2F2F2">
                 <td style="border: none; min-width: 60px;">
-                    Time & Notes
+                    Time & Notes<span style="color: red;">*</span>
                 </td>
                 <td style="border: none; min-width: 100px">
                     <textarea rows="3" id="inTheaterDrugNotes" placeholder="Unit, additional notes etc." required></textarea>
@@ -65,7 +65,7 @@
             </tr>
         </table>
         <button type="button" style="margin: 10px 0px" id="addInTheaterDrug">Add</button>
-        <p id="inTheaterErrorMsg"></p>
+        <p id="inTheaterDrugErrorMsg"></p>
     </form>
 
 </div>

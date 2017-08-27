@@ -69,10 +69,27 @@
 
     preTheaterDrugs.add = function(){
 
-
         var drug = drugConceptMap[jq('#preTheaterDrug-field').val()];
-        var quantity = jq('#preTheaterDrugQuantity-field').val();
+        var quantity = jq('#preTheaterDrugQuantity').val();
         var notes = jq('#preTheaterDrugNotes').val();
+        var error = jq('#preTheaterDrugErrorMsg');
+        error.hide();
+
+        if (jq('#preTheaterDrug-field').val() == 0){
+            error.text("Please enter a drug.");
+            error.show();
+            return;
+        }
+        else if (quantity.length == 0){
+            error.text("Please enter a quantity.");
+            error.show();
+            return;
+        }
+        else if (notes == "") {
+            error.text("Please enter notes (unit of quantity etc.)");
+            error.show();
+            return;
+        }
 
         console.log("Request data");
         console.log('drug: ', drug);

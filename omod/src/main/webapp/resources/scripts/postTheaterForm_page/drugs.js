@@ -120,7 +120,7 @@
         var drug = drugConceptMap[jq('#' + table + 'DrugName').val()];
         var quantity = jq('#' + table + 'DrugQuantity').val();
         var notes = jq('#' + table + 'DrugNotes').val();
-        var error = jq('#' + table + 'ErrorMsg');
+        var error = jq('#' + table + 'DrugErrorMsg');
         error.hide();
 
         if (jq('#' + table + 'DrugName').val() == 0){
@@ -138,10 +138,7 @@
             error.show();
             return;
         }
-
-
-
-
+        
         console.log("Request data");
         console.log('drug: ', drug);
         console.log('quantity: ', quantity);
