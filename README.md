@@ -1,5 +1,4 @@
 # Operation Theater Module - OpenMRS
-===============================
 
 This repository contains the source code of the Operation Theater module made for OpenMRS as part of a Google Summer of Code project.
 
