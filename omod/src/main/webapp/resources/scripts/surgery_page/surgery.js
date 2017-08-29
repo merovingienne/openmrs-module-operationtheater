@@ -24,6 +24,11 @@
                         //change button text
                         jq('#setProcedureButton').text(emr.message("general.save"));
                         workflow.getDataFromServer();
+
+                        // reload page to display general actions.
+
+                        window.location.replace("/openmrs/operationtheater/surgery.page?surgeryId=" + surgeryUuid + "&patientId=" + patientId);
+
                     }, function (err) {
                         emr.handleError(err);
                     }
